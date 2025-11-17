@@ -1,3 +1,4 @@
 # Ignore 
 /SPIX-output
 SPIX-Config-Complete.ps1
+SPIX-*.properties
