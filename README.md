@@ -55,11 +55,11 @@ By default the SPIX.ps1 script will look for the file in the current directory.
 
 ## Help
 
-SPIX **-Help**
+SPIX -Help
 
 ## Export
 
-SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Key \<passphrase>] [-Delimiter \<character>] [-Quiet]
+SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Key \<passphrase>] [-Quiet]
 
 
 | Parameter | Description |
@@ -71,16 +71,11 @@ SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<catego
 | &#8209;AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name for the target application. Wildcard `*` can be used. |  
 | &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
 | &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account to export. Wildcard `*` can be used. |  
-| &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is fetched.|  
+| &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed before the password is fetched. |  
 | &#8209;Key&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
-| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
 | &#8209;Quiet | Less output when running SPIX |  
 
-
-When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after SPIX has completed its export of target account passwords. It can be deleted manually and will be created next time SPIX is exporting target account passwords.
-
-
-### Examples
+### Example
 
 ```
 .\SPIX -Export -Category Target -ExtensionType Windows*
@@ -108,7 +103,6 @@ Done
 PS W:\>
 ```
 
-The command above will fetch **Targets**, i.e. TargetServer, TargetApplication and TargetAccount, but only where the extensionType starts with 'windows'.
 
 ```
 PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Key ""
@@ -119,73 +113,5 @@ Done
 PS W:\>
 ```
 
-The exported passwords must be encrypted (-key option), but no passphrase is given on hte command line. SPIX will prompt the user to enter a passphrase and confirm it before proceeding. The passphrase is hashed and the hash is used as encryption key. The encryption itself uses random salt value, such that two exports of the same account password will have different encrypted text.
-
-```
-PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -AppName *breakgæass*
-Exporting TargetAccount
-... windowsDomainService
-Run time: 2 seconds
-Done
-PS W:\>
-```
-
-Export target account where the extension type is 'windowsDomainService' and the application name contains the word 'breakglass'.
 
 
-## Import
-
-SPIX **-Import** [-ConfigPath \<path>] [-InputFile \<filename>] [-Synchronize] [-UpdatePassword] [-Key \<passphrase>] [-Delimiter \<character>] [-Quiet]
-
-
-| Parameter | Description |
-| :---- | :---- |
-| &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
-| &#8209;InputFile&nbsp;\<filename> | Filename with import information. |
-| &#8209;Synchronize | Flag used when creating new accounts. PAM will try to synchronize the account when it is added. |  
-| &#8209;UpdatePassword | Flag used when creating new accounts. PAM will set the account password to a new random value according to the PCP used for the target application. |  
-| &#8209;Key&nbsp;\<passphrase> | Used when updating existing accounts. The password in hte import file is encrypted using the passphrase given. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password. |  
-| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
-| &#8209;Quiet | Less output when running SPIX |  
-
-
-# SPIX Password
-
-There is a utility named `SPIX-Passwpord` available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. The encrypted password is prefixed with `{enc}`.
-
-If the **-key** option is not provided, the user is prompted for the passphrase.
-
-
-Encrypt:
-
-```
-.\SPIX-Password.ps1 -Key <passphrase> -Password <password> 
-```
-
-Decrypt:
-
-```
-.\SPIX-Password.ps1 -Key <passphrase> -EncryptedPassword <encrypted password> 
-```
-
-Example
-
-```
-PS W:\> .\SPIX-Password.ps1 -Key 'MyPassphrase' -Password 'HelloWorld'
-{enc}FMoZGS3utUnmQDKEa3shLLEImWiZ6Ol0MgqL7VFdTSuXYU5eQAaN/v+Z7/XgZPJT
-
-PS W:\> .\SPIX-Password.ps1 -Key 'MyPassphrase' -Password 'HelloWorld'
-{enc}IG0Zf2BODJkHKgrwIJsbjFf369d4XWbw1oFFHd8KTPNhF9MISBLt70yLeGDyrVXP
-
-PS W:\> .\SPIX-Password.ps1 -Key 'MyPassphrase' -Password 'HelloWorld'
-{enc}GhmDUPlD0v4Fvs27yUt2pEoMxdIhc4oeqDd5eHY8/sjZSfPx+xVm5M+HhX8zQMmp
-
-PS W:\> .\SPIX-Password.ps1 -Key 'MyPassphrase' -Password 'HelloWorld'
-{enc}ElYk9EjTIjbC7/yApiRLm+tqX9TDKH9oP/Gg9Il3cnG5dGMlGd+sg4Eych1aJaZ2
-
-PS W:\> .\SPIX-Password.ps1 -Key 'MyPassphrase' -EncryptedPassword '{enc}ElYk9EjTIjbC7/yApiRLm+tqX9TDKH9oP/Gg9Il3cnG5dGMlGd+sg4Eych1aJaZ2'
-HelloWorld
-
-```
-
-Note that using the same passphrase and same password will return different encrypted passwords.
