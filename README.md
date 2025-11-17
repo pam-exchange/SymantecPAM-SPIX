@@ -59,18 +59,59 @@ SPIX -Help
 
 ## Export
 
-SPIX **-Export** [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Key \<passphrase>] [-Quiet]
+SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Key \<passphrase>] [-Quiet]
 
 
 | Parameter | Description |
 | :---- | :---- |
-| -OutputPath&nbsp;\<path> | Path where exported files are stored. Default is |
-| -Category&nbsp;\<cat> | One or more categories to export. Available options are<br/>**ALL**<br/>**Target**<br/>- TargetServer<br/>- TargetApplication<br/>- TargetAccount<br/>**A2A**<br/>- RequestServer<br/>- RequestScript<br/>- Authorization<br/>- Proxy<br/>**Policy**<br/>- PCP<br/>- PVP<br/>- JIT or CustomWorkflow<br/>- SSHKeyPairPolicy<br/>**UserGroup**<br/>- User<br/>- Role<br/>- Filter<br/>- Group<br/>**Secret**<br/>- Vault<br/>- VaultSecret<br/>AccessPolicy<br/>Service<br/>Device |
-| -SrvName&nbsp;\<filter> | Used with Category `Target`, `TargetServer`, `TargetApplication` and `TargetAccount`.<br/>Specify a hostname for the target server. Wildcard `*` can be used. |  
-| -AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name for the target application. Wildcard `*` can be used. |  
-| -AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
-| -ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension (just one) for application and account to export. |  
-| -ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed before the password is fetched. |  
-| -Key&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
-| -Quiet | Less output when running SPIX |  
+| &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
+| &#8209;OutputPath&nbsp;\<path> | Path where exported files are stored. Default is `.\SPIX-output`. |
+| &#8209;Category&nbsp;\<category> | One or more categories to export. Available options are<br/>**ALL**<br/>**Target**<br/>- TargetServer<br/>- TargetApplication<br/>- TargetAccount<br/>**A2A**<br/>- RequestServer<br/>- RequestScript<br/>- Authorization<br/>- Proxy<br/>**Policy**<br/>- PCP<br/>- PVP<br/>- JIT or CustomWorkflow<br/>- SSHKeyPairPolicy<br/>**UserGroup**<br/>- User<br/>- Role<br/>- Filter<br/>- Group<br/>**Secret**<br/>- Vault<br/>- VaultSecret<br/>AccessPolicy<br/>Service<br/>Device |
+| &#8209;SrvName&nbsp;\<filter> | Used with Category `Target`, `TargetServer`, `TargetApplication` and `TargetAccount`.<br/>Specify a hostname for the target server. Wildcard `*` can be used. |  
+| &#8209;AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name for the target application. Wildcard `*` can be used. |  
+| &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
+| &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account to export. Wildcard `*` can be used. |  
+| &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed before the password is fetched. |  
+| &#8209;Key&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
+| &#8209;Quiet | Less output when running SPIX |  
+
+### Example
+
+```
+.\SPIX -Export -Category Target -ExtensionType Windows*
+```
+
+Will export TargetServer, TargetApplication and TargetAccount, but only where the extensionType starts with **windows**. The output directory is `.\SPIX-output` and configuration file is current directory `.\`.
+
+```
+PS W:\> .\SPIX.ps1 -Export -Category Target -ExtensionType windows* -ShowPassword
+Exporting TargetServer
+Exporting TargetApplication
+... windows
+... windowsDomainService
+... windowsRemoteAgent
+... windowsSshKey
+... windowsSshPassword
+Exporting TargetAccount
+... windows
+... windowsDomainService
+... windowsRemoteAgent
+... windowsSshKey
+... windowsSshPassword
+Run time: 2 seconds
+Done
+PS W:\>
+```
+
+
+```
+PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Key ""
+Exporting TargetAccount
+... windowsDomainService
+Run time: 2 seconds
+Done
+PS W:\>
+```
+
+
 
