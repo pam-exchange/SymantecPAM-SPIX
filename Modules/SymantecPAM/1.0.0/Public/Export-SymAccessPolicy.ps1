@@ -89,12 +89,10 @@ function Export-SymAccessPolicy (
             }
             $obj.targetAccounts= $str
 
-            <#
             foreach ($p in $obj.PSObject.Properties | Where-Object {$_.Value -match '^(t|f)$'}) {
                 if ($p.Value -eq "t") {$p.Value= 'true'}
                 else {$p.value= 'false'}
             }
-            #>
         }
 
         #>

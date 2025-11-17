@@ -26,43 +26,13 @@ SOFTWARE.
 
 # ----------------------------------------------------------------------------------
 param (
-    [Parameter(ParameterSetName='Help')][switch] $Help= $false,
+    [Parameter(Mandatory=$true,ParameterSetName='Encrypt')][String] $Password,
+    [Parameter(Mandatory=$true,ParameterSetName='Decrypt')][String] $EncryptedPassword,
 
-    [Parameter(ParameterSetName='Export')]
-    [Parameter(ParameterSetName='Import')]
-    [string] $ConfigPath= ".\",
-
-    [Parameter(Mandatory=$true,ParameterSetName='Export')][switch] $Export= $false,
-    [Parameter(ParameterSetName='Export')][string] $OutputPath= '.\SPIX-output',
-    [Parameter(ParameterSetName='Export')][string] $Category= 'ALL',
-    [Parameter(ParameterSetName='Export')][switch] $ShowPassword= $false,
-    [Parameter(ParameterSetName='Export')][string] $SrvName= '',
-    [Parameter(ParameterSetName='Export')][string] $AppName= '',
-    [Parameter(ParameterSetName='Export')][string] $AccName= '',
-    [Parameter(ParameterSetName='Export')][string] $ExtensionType= '',
-
-    [Parameter(Mandatory=$true,ParameterSetName='Import')][switch] $Import= $false,
-    [Parameter(Mandatory=$true,ParameterSetName='Import')][string] $InputFile,
-    [Parameter(ParameterSetName='Import')][switch] $Synchronize= $false,
-    [Parameter(ParameterSetName='Import')][switch] $UpdatePassword= $false,
-
-    [Parameter(ParameterSetName='Export')]
-    [Parameter(ParameterSetName='Import')]
     [AllowEmptyString()]
     [AllowNull()]
-    [string] $Key,
-
-    [Parameter(ParameterSetName='Export')]
-    [Parameter(ParameterSetName='Import')]
-    [string] 
-    $Delimiter= ';',
-
-    [Parameter(ParameterSetName='Export')]
-    [Parameter(ParameterSetName='Import')]
-    [switch] $Quiet= $false
+    [string] $Key
 )
-
-
 
 # ----------------------------------------------------------------------------------
 begin {
@@ -92,14 +62,10 @@ begin {
 process {
 
     try {
-        Start-SymantecPAM -ConfigPath $ConfigPath
-
-        $Timestamp= $startTime.ToString('yyyyMMdd-HHmmss')
-
         #
         # Prompt for passphrase when "-ShowPassword -key ''" is used
         #
-        if ($ShowPassword -and $PSBoundParameters.ContainsKey('Key')) {
+        if (!$key -or $PSBoundParameters.ContainsKey('Key')) {
             # Key parameter WAS passed
             if ([string]::IsNullOrWhiteSpace($Key)) {
                 $key= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
@@ -119,14 +85,13 @@ process {
             }
         }
 
-        if ($Export) {
-            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $HostName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Key $Key -Quiet:$Quiet
-        }
-        elseif ($Import) {
-            $res= Merge-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Key $Key
+        if ($password) {
+            $EncryptedPassword= Protect-SymPassword -Password $Password -Key $key
+            Write-Host $EncryptedPassword
         }
         else {
-            Write-Host 'some help' -ForegroundColor Green
+            $Password= Unprotect-SymPassword -EncryptedPassword $EncryptedPassword -Key $Key
+            Write-Host $password
         }
 
     } 
@@ -134,29 +99,10 @@ process {
         Write-Host "Exception: $($_.Exception.GetType().FullName)`nMessage: $($_.Exception.Message)`nDetails: $($_.Exception.Details)" -ForegroundColor Yellow
         Write-Host $_.ScriptStackTrace -ForegroundColor Gray
     }
-    finally {
-        Stop-SymantecPAM
-    }
-
 }
-
 
 # ----------------------------------------------------------------------------------
 end {
-    try {
-        # --- Elapsed time ---
-        $t= $([int]((Get-Date -ErrorAction SilentlyContinue)-$startTime).TotalSeconds)
-
-        $h= [int][Math]::Floor( $t / 3600 )
-        $m= [int][Math]::Floor( ($t - $h*3600) / 60 )
-        $s= [int][Math]::Floor( $t - $h*3600 -$m*60 )
-
-        if ($h -gt 0)     {Write-Host "Run time: $h hours, $m minutes, $s seconds" -ForegroundColor Gray}
-        elseif ($m -gt 0) {Write-Host "Run time: $m minutes, $s seconds" -ForegroundColor Gray}
-        else              {Write-Host "Run time: $s seconds" -ForegroundColor Gray}
-    } catch {}
-
-    Write-Host 'Done' -ForegroundColor White
 }
 
 # -- end-of-file ---

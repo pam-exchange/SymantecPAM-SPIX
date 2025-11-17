@@ -36,8 +36,7 @@ function Export-SymTargetAccount (
 
     [Parameter(Mandatory=$false)][string] $Delimiter= ",",
 
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false,
-    [Parameter(Mandatory=$false)][switch] $WhatIf= $false
+    [Parameter(Mandatory=$false)][switch] $Quiet= $false
 )
 {
 	process {

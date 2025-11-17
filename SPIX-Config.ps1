@@ -6,11 +6,9 @@ $configSymantecPAM = @{
 
 		cliUsername= "symantecCLI"; 
 		cliPassword= "xxxxxxxxxxx";
-        cliAlias= $null;
 
         apiUsername= "symantecAPI-131001";
         apiPassword= "xxxxxxxxxxx";
-        apiAlias= $null;
 
         tcf= ("keystorefile","configfile","mongodb","postgresql","pamuser");
         delimiter= ";"

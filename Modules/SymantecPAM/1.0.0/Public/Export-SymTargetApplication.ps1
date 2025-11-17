@@ -37,8 +37,7 @@ function Export-SymTargetApplication (
     [Parameter(Mandatory=$false)][string] $OutputPath= ".\SPIX-output",
     [Parameter(Mandatory=$false)][string] $Delimiter= ",",
 
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false,
-    [Parameter(Mandatory=$false)][switch] $WhatIf= $false
+    [Parameter(Mandatory=$false)][switch] $Quiet= $false
 )
 {
 	process {

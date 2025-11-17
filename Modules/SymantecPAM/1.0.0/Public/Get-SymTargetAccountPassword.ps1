@@ -54,7 +54,17 @@ function Get-SymTargetAccountPassword ()
                     $pvpOrg.exclusiveCheckoutRequired -eq 'true' -or
                     $pvpOrg.authenticationRequiredView -eq 'true')
                 {
-                    $pvpNew= Get-SymPVP -Name Default
+                    try {
+                        $pvpNew= Get-SymPVP -Name "SPIX-PVP" -Single -NoEmptySet
+                    }
+                    catch {
+                        $params= @{
+                            action= 'New'
+                            name= 'SPIX-PVP'
+                            description= 'PVP used by SPIX'
+                        }
+                        $pvpNew= Sync-SymPVP -params $params
+                    }
 
                     $update= $acc
                     $update.passwordViewPolicyID= $pvpNew.id

@@ -89,8 +89,7 @@ function Export-Sym (
 
     [AllowEmptyString()][string] $Delimiter,
 
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false,
-    [Parameter(Mandatory=$false)][switch] $WhatIf= $false
+    [Parameter(Mandatory=$false)][switch] $Quiet= $false
 )
 {
     process {
@@ -108,7 +107,7 @@ function Export-Sym (
         switch ($Category) {
             {'ALL', 'Target','TargetServer' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export TargetServer"}
+                if (!$Quiet) {Write-Host "Exporting TargetServer"}
                 $targetServer = Get-SymTargetServer -srvName $srvName
                 $fixedColumns = @('ID','ObjectType','Action','deviceName','hostname','ipAddress','Attribute.descriptor1','Attribute.descriptor2')
                 $ignoreColums = @('deviceId')
@@ -117,25 +116,25 @@ function Export-Sym (
 
             {'ALL', 'Target','TargetApplication' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export TargetApplication"}
+                if (!$Quiet) {Write-Host "Exporting TargetApplication"}
                 $targetApplication = Get-SymTargetApplication -srvName $srvName -appName $appName -ExtensionType $ExtensionType
                 $fixedColumns = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','name','PCP','Attribute.descriptor1','Attribute.descriptor2')
                 $ignoreColums = @('deviceId','policyID','TargetServerID','overrideDnsType','Attribute.agentId','Attribute.sshKeyPairPolicyID','Attribute.customWorkflowId')
-                Export-SymTargetApplication -List $targetApplication -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -Quiet:$Quiet -WhatIf:$WhatIf
+                Export-SymTargetApplication -List $targetApplication -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -Quiet:$Quiet
             }
 
             {'ALL', 'Target','TargetAccount' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export TargetAccount"}
+                if (!$Quiet) {Write-Host "Exporting TargetAccount"}
                 $targetAccount = Get-SymTargetAccount -srvName $srvName -appName $appName -accName $accName -ExtensionType $ExtensionType
                 $fixedColumns = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','targetApplicationName','username','password')
                 $ignoreColums = @('cacheAllowed','cacheBehaviorInt','compoundAccount','compoundServerIDs','ownerUserID','passwordViewPolicyID','parentAccountId','Privileged','ServerkeyID','TargetApplication','TargetApplicationID','TargetServerAlias','TargetServerID')
-                Export-SymTargetAccount -List $targetAccount -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -ShowPassword:$ShowPassword -Key $Key -Quiet:$Quiet -WhatIf:$WhatIf
+                Export-SymTargetAccount -List $targetAccount -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -ShowPassword:$ShowPassword -Key $Key -Quiet:$Quiet
             }
 
             {'ALL', 'A2A','RequestServer' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export RequestServer"}
+                if (!$Quiet) {Write-Host "Exporting RequestServer"}
                 $requestServer = Get-SymRequestServer
                 $fixedColumns = @('ID','ObjectType','Action','deviceName','hostname','ipAddress','Attribute.descriptor1','Attribute.descriptor2')
                 $ignoreColums = @('deviceId','serverKeyId','SiteID')
@@ -144,7 +143,7 @@ function Export-Sym (
 
             {'ALL', 'A2A','RequestScript' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export RequestScript"}
+                if (!$Quiet) {Write-Host "Exporting RequestScript"}
                 $requestScript = Get-SymRequestScript
                 $fixedColumns = @('ID','ObjectType','Action','name','RequestServer','type')
                 $ignoreColums = @('deviceID','RequestServerID')
@@ -153,7 +152,7 @@ function Export-Sym (
 
             {'ALL', 'A2A','Authorization' -eq $_}
             {    
-                if (!$Quiet) {Write-Host "Export Authorization"}
+                if (!$Quiet) {Write-Host "Exporting Authorization"}
                 $authorization= Get-SymAuthorization
                 $fixedColumns= @('ID','ObjectType','Action','targetGroup','targetAlias','script','requestServer','requestGroup','checkExecutionID','executionUser')
                 $ignoreColums= @('requestGroupID','requestServerID','scriptID','targetAliasID','targetGroupID')
@@ -162,7 +161,7 @@ function Export-Sym (
 
             {'ALL', 'Proxy' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Proxy"}
+                if (!$Quiet) {Write-Host "Exporting Proxy"}
                 $proxy= Get-SymProxy
                 $fixedColumns= @('ID','ObjectType','Action','deviceName','hostname','ipAddress')
                 $ignoreColums= @('serverKeyId','SiteID','pendingAcknowledgement','currentKey','oldKey','lastDigestLoginDate','lastPatchStatusChangeDate')
@@ -171,7 +170,7 @@ function Export-Sym (
 
             {'ALL', 'Policy', 'PCP' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export PCP"}
+                if (!$Quiet) {Write-Host "Exporting PCP"}
                 $PCP= Get-SymPCP
                 $fixedColumns= @('ID','ObjectType','Action','name','type','Description')
                 $ignoreColums= @()
@@ -180,7 +179,7 @@ function Export-Sym (
 
             {'ALL', 'Policy','PVP' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export PVP"}
+                if (!$Quiet) {Write-Host "Exporting PVP"}
                 $PVP= Get-SymPVP
                 $fixedColumns= @('ID','ObjectType','Action','name','Description')
                 $ignoreColums= @('approverIDs','emailNotificationUserIDs')
@@ -189,7 +188,7 @@ function Export-Sym (
 
             {'ALL', 'Policy', 'SSHKeyPairPolicy' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export SSHKeyPairPolicy"}
+                if (!$Quiet) {Write-Host "Exporting SSHKeyPairPolicy"}
                 $SSH= Get-SymSSHKeyPairPolicy
                 $fixedColumns= @('ID','ObjectType','Action','name','Description','Attribute.keyType','Attribute.keyLength')
                 $ignoreColums= @('SSHKeyType','SSHKeyLength','type')
@@ -198,7 +197,7 @@ function Export-Sym (
 
             {'ALL', 'Policy', 'JIT','CustomWorkflow' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export CustomWorkflow"}
+                if (!$Quiet) {Write-Host "Exporting CustomWorkflow"}
                 $JIT= Get-SymCustomWorkflow
                 $fixedColumns= @('ID','ObjectType','Action','name','applicationType','Description')
                 $ignoreColums= @()
@@ -207,7 +206,7 @@ function Export-Sym (
 
             {'ALL', 'UserGroup', 'Filter' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Filter"}
+                if (!$Quiet) {Write-Host "Exporting Filter"}
                 $filter= Get-SymFilter
                 $fixedColumns= @('ID','ObjectType','Action')
                 $ignoreColums= @('groupID')
@@ -216,7 +215,7 @@ function Export-Sym (
 
             {'ALL', 'UserGroup', 'Group' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Group"}
+                if (!$Quiet) {Write-Host "Exporting Group"}
                 $group= Get-SymGroup 
                 $fixedColumns= @('ID','ObjectType','Action','name','Description')
                 $ignoreColums= @('readOnly')
@@ -225,7 +224,7 @@ function Export-Sym (
 
             {'ALL', 'UserGroup', 'Role' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Role"}
+                if (!$Quiet) {Write-Host "Exporting Role"}
                 $role= Get-SymRole
                 $fixedColumns= @('ID','ObjectType','Action','name','Description')
                 $ignoreColums= @('Readonly')
@@ -234,7 +233,7 @@ function Export-Sym (
 
             {'ALL', 'UserGroup', 'User' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export User"}
+                if (!$Quiet) {Write-Host "Exporting User"}
                 $user= Get-SymUser
                 $fixedColumns= @('ID','ObjectType','Action','name','Description')
                 $ignoreColums= @('serverKeyId','userGroupIDs','userID')
@@ -243,7 +242,7 @@ function Export-Sym (
 
             {'ALL', 'UserGroup' -eq $_}
             {    
-                if (!$Quiet) {Write-Host "Export UserGroup"}
+                if (!$Quiet) {Write-Host "Exporting UserGroup"}
                 $userGroup= Get-SymUserGroup
                 $fixedColumns= @('ID','ObjectType','Action','name','description','targetGroup','requestorGroup','role')
                 $ignoreColums= @('groups','readOnly','groupIDs','roleID')
@@ -252,7 +251,7 @@ function Export-Sym (
 
             {'ALL', 'Secret', 'Vault' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Vault"}
+                if (!$Quiet) {Write-Host "Exporting Vault"}
                 $vault= Get-SymVault
                 $fixedColumns= @('ID','ObjectType','Action','name','description')
                 $ignoreColums= @()
@@ -261,7 +260,7 @@ function Export-Sym (
 
             {'ALL', 'Secret', 'VaultSecret' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export VaultSecret"}
+                if (!$Quiet) {Write-Host "Exporting VaultSecret"}
                 $vaultSecret= Get-SymVaultSecret
                 $fixedColumns= @('ID','ObjectType','Action','vaultName','name','aliases','SecretTypeName','value','format','firstDescriptor','secondDescriptor')
                 $ignoreColums= @('ServerKeyID','extensionType')
@@ -270,7 +269,7 @@ function Export-Sym (
 
             {'ALL', 'AccessPolicy' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export AccessPolicy"}
+                if (!$Quiet) {Write-Host "Exporting AccessPolicy"}
                 $accessPolicy= Get-SymAccessPolicy
                 $fixedColumns= @('ID','ObjectType','Action','User','Device')
                 $ignoreColums= @()
@@ -279,7 +278,7 @@ function Export-Sym (
 
             {'ALL', 'Service' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Service"}
+                if (!$Quiet) {Write-Host "Exporting Service"}
                 $service = Get-SymService
                 $fixedColumns = @('ID','ObjectType','Action','Name','ServiceType','localIP','ports','comments')
                 $ignoreColums = @()
@@ -288,7 +287,7 @@ function Export-Sym (
 
             {'ALL', 'Device' -eq $_}
             {
-                if (!$Quiet) {Write-Host "Export Device"}
+                if (!$Quiet) {Write-Host "Exporting Device"}
                 $device= Get-SymDevice
                 $fixedColumns = @('ID','ObjectType','Action','Name')
                 $ignoreColums = @('deviceId','deviceName','deviceGroupMembership')
