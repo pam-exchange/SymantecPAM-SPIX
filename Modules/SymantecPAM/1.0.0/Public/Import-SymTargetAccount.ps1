@@ -30,25 +30,23 @@ SOFTWARE.
 
 
 #--------------------------------------------------------------------------------------
-function Merge-SymTargetAccount (
-    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv
+function Import-SymTargetAccount (
+    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv,
+    [string] $Passphrase= ""
 )
 {
 	process {
         $failedImport= New-Object System.Collections.ArrayList
         foreach ($row in $InputCsv) {
             try {
-                if ($row.Action -notmatch "^(Update|New)$") {
+                if ($row.Action -notmatch "^(Update|New|Remove)$") {
                     continue
                 }
                 $params= $row | Select-Object * -ExcludeProperty cacheAllow,ObjectType,deviceName,PasswordVerified,'Attribute.isProvisionedAccount'
 
                 switch($params.extensionType) {
                 'AwsAccessCredentials' {
-                    break
-                }
-                'AwsAccessCredentials' {
-                    #$params.'Attribute.awsCredentialType'= ('EC2PRIVATE_KEY', 'SECRET_ACCESS_KEY')       # required
+                    if ($params.'Attribute.awsCredentialType') {$params.'Attribute.awsCredentialType'= $params.'Attribute.awsCredentialType'.ToUpper()}
                     #$params.'Attribute.passphrase'
                     #$params.'Attribute.awsKeyPairName'
                     #$params.'Attribute.accountFriendlyName'
@@ -108,7 +106,6 @@ function Merge-SymTargetAccount (
                     }
                     break
                 }
-                'Generic' {break}
                 'HPServiceManager' {
                     if (!$params.'Attribute.useOtherAccountToChangePassword') {
                         $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
@@ -185,9 +182,6 @@ function Merge-SymTargetAccount (
                     }
                     break
                 }
-                'nsxcontroller' {break}
-                'nsxmanager' {break}
-                'nsxproxy' {break}
                 'oracle' {
                     #$params.'Attribute.schema'
                     #$params.'Attribute.useOid'
@@ -227,10 +221,6 @@ function Merge-SymTargetAccount (
                     }
                     break
                 }
-                'RadiusTacacsSecret' {break}
-                'remedy' {break}
-                'ServiceDeskBroker' {break}
-                'ServiceNow' {break}
                 'SPML2' {
                     $params.'Attribute.extensionType'= $params.extensionType
                     if (!$params.'Attribute.useOtherAccountToChangePassword') {
@@ -275,7 +265,6 @@ function Merge-SymTargetAccount (
                     }
                     break
                 }
-                'vcf' {break}
                 'vmware' {
                     $params.'Attribute.extensionType'= $params.extensionType
                     if (!$params.'Attribute.useOtherAccountToChangePassword') {
@@ -303,7 +292,6 @@ function Merge-SymTargetAccount (
                     }
                     break
                 }
-                'windows' {break}
                 'windowsDomainService' {
                     $params.'Attribute.extensionType'= $params.extensionType
                     #$params.'Attribute.userDN'
@@ -342,9 +330,24 @@ function Merge-SymTargetAccount (
                     #$params.'Attribute.changeProcess'
                     break
                 }
+
+                <#
+                'AwsAccessCredentials' {break}
+                'Generic' {break}
+                'nsxcontroller' {break}
+                'nsxmanager' {break}
+                'nsxproxy' {break}
+                'RadiusTacacsSecret' {break}
+                'remedy' {break}
+                'ServiceDeskBroker' {break}
+                'ServiceNow' {break}
+                'vcf' {break}
+                'windows' {break}
                 'windowsSshPassword' {break}
                 'XsuiteApiKey' {break}
-                }
+                #>
+
+                } # end switch
 
                 # 
                 # Some TCF connectors may use 'loginAccount' 
@@ -353,7 +356,14 @@ function Merge-SymTargetAccount (
                     $params.'Attribute.loginAccount'= _decodeOtherAccount($params.'Attribute.loginAccount')
                 }
 
+                #
+                # Decrypt password
+                #
+                if ($params.password -and $params.password.StartsWith('{enc}')) {
+                    $params.password= _Decrypt-PBKDF2 -CipherBase64 $params.password -Password $Passphrase
+                }
 
+                # Update/New/Remove from PAM
                 $res= Sync-SymTargetAccount -params $params
             }
             catch {

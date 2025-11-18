@@ -39,7 +39,7 @@ enum DONOTIMPORT {
 
 
 #--------------------------------------------------------------------------------------
-function Merge-SymTargetApplication (
+function Import-SymTargetApplication (
     [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject] $InputCsv
 )
 {

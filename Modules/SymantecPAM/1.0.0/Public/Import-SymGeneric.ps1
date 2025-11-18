@@ -25,7 +25,7 @@ SOFTWARE.
 #--------------------------------------------------------------------------------------
 
 
-function Merge-SymGeneric (
+function Import-SymGeneric (
     [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv
 )
 {

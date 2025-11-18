@@ -50,7 +50,7 @@ param (
     [Parameter(ParameterSetName='Import')]
     [AllowEmptyString()]
     [AllowNull()]
-    [string] $Key,
+    [string] $Passphrase,
 
     [Parameter(ParameterSetName='Export')]
     [Parameter(ParameterSetName='Import')]
@@ -97,22 +97,22 @@ process {
         $Timestamp= $startTime.ToString('yyyyMMdd-HHmmss')
 
         #
-        # Prompt for passphrase when "-ShowPassword -key ''" is used
+        # Prompt for passphrase when "-ShowPassword -Passphrase ''" is used
         #
-        if ($ShowPassword -and $PSBoundParameters.ContainsKey('Key')) {
+        if ($ShowPassword -and $PSBoundParameters.ContainsKey('Passphrase')) {
             # Key parameter WAS passed
-            if ([string]::IsNullOrWhiteSpace($Key)) {
-                $key= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+            if ([string]::IsNullOrWhiteSpace($Passphrase)) {
+                $Passphrase= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
                     [Runtime.InteropServices.Marshal]::SecureStringToBSTR(
                         (Read-Host "Enter encryption passphrase" -AsSecureString)
                     )
                 ))
-                $key2= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+                $Passphrase2= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
                     [Runtime.InteropServices.Marshal]::SecureStringToBSTR(
                         (Read-Host "Confirm encryption passphrase" -AsSecureString)
                     )
                 ))
-                if ($key -cne $key2) {
+                if ($Passphrase -cne $Passphrase2) {
                     Write-Host "Encryption passphrase does not match." -ForegroundColor Yellow
                     return
                 }
@@ -120,10 +120,10 @@ process {
         }
 
         if ($Export) {
-            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $HostName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Key $Key -Quiet:$Quiet
+            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $HostName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
         }
         elseif ($Import) {
-            $res= Merge-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Key $Key
+            $res= Import-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Passphrase $Passphrase
         }
         else {
             Write-Host 'some help' -ForegroundColor Green

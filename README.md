@@ -149,6 +149,31 @@ SPIX **-Import** [-ConfigPath \<path>] [-InputFile \<filename>] [-Synchronize] [
 | &#8209;Quiet | Less output when running SPIX |  
 
 
+### Import CSV
+
+The exported CSV file will always contain a column **ID**, **ObjectType** and **Action**.
+The CSV file can be used as a template for importing through a CSV file. 
+
+Available actions are
+
+- **New**  
+Will create a new object of the ObjectType. The remaining columns describes the new object and all the parameters necessary.
+
+- **Update**  
+Will update the object with the ID and Name. Parameters are found in the remaining columns and will depend on the type of object.
+
+- **Remove**  
+Will remove or delete the object with the ID and Name.
+
+- **Empty**  
+The row in the CSV file is ignored.
+ 
+
+![Export/Import CSV](/Docs/SPIX-Export.png)
+
+Not all ObjectTypes and for TargetApplications and TargerAccounts the extensionType can be created or updated using the SPIX import mechanism.
+
+
 # SPIX Password
 
 There is a utility named `SPIX-Passwpord` available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. The encrypted password is prefixed with `{enc}`.

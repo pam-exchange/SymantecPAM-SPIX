@@ -25,18 +25,15 @@ SOFTWARE.
 
 #--------------------------------------------------------------------------------------
 function Export-SymTargetAccount (
-    [Parameter(Mandatory=$false)][AllowEmptyString()][PSCustomObject[]] $List= $null,
-    [Parameter(Mandatory=$false)][string] $Timestamp,
-    [Parameter(Mandatory=$false)][string[]] $fixedColumns,
-    [Parameter(Mandatory=$false)][string[]] $ignoreColums,
-    [Parameter(Mandatory=$false)][string] $OutputPath= ".\SPIX-output",
-
+    [AllowEmptyString()][PSCustomObject[]] $List= $null,
+    [string] $Timestamp,
+    [string[]] $fixedColumns,
+    [string[]] $ignoreColums,
+    [string] $OutputPath= ".\SPIX-output",
     [switch] $ShowPassword= $false,
-    [AllowEmptyString()][string] $Key= "",
-
-    [Parameter(Mandatory=$false)][string] $Delimiter= ",",
-
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false
+    [string] $Passphrase= "",
+    [string] $Delimiter= ",",
+    [switch] $Quiet= $false
 )
 {
 	process {
@@ -57,9 +54,9 @@ function Export-SymTargetAccount (
 
             if (!$Quiet) {Write-Host "... $ext" -ForegroundColor Gray}
 
+            #
             # resolve compoundServers
-            #foreach ($obj in $($script:cacheTargetAccountBase | Where-Object {$_.compoundServerIDs})) {
-            #foreach ($obj in $($List | Where-Object {$_.compoundServerIDs})) {
+            #
             foreach ($obj in $($csv | Where-Object {$_.compoundServerIDs})) {
                 if ($obj.compoundServerIDs) {
                     $csList= ""
@@ -78,8 +75,8 @@ function Export-SymTargetAccount (
                 #foreach ($obj in $List) {
                 foreach ($obj in $csv) {
                     $obj.Password= Get-SymTargetAccountPassword -AccountID $obj.ID -Unattended
-                    if ($Key) {
-                        $enc= _Encrypt-PBKDF2 -PlainText $obj.Password -Password $Key
+                    if ($Passphrase) {
+                        $enc= _Encrypt-PBKDF2 -PlainText $obj.Password -Password $Passphrase
                         $obj.Password= "{enc}"+$enc
                     }
                 }

@@ -24,7 +24,7 @@ SOFTWARE.
 #>
 #--------------------------------------------------------------------------------------
 
-function Merge-Sym (
+function Import-Sym (
     [string] $InputFile,
     [string] $Delimiter,
     [string] $Timestamp,
@@ -55,17 +55,17 @@ function Merge-Sym (
                 'Authorization'     { }
                 'Filter'            { $failed= $null }
                 'Group'             { $failed= $null }
-                'PCP'               { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'Proxy'             { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'PVP'               { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'RequestScript'     { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'RequestServer'     { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'Role'              { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'SSHKeyPairPolicy'  { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'TargetAccount'     { $failed= Merge-SymTargetAccount -InputCsv $InputCsv; break }
-                'TargetApplication' { $failed= Merge-SymTargetApplication -InputCsv $InputCsv; break }
-                'TargetServer'      { $failed= Merge-SymGeneric -InputCsv $InputCsv; break }
-                'UserGroup'         { $failed= Merge-SymUserGroup -InputCsv $InputCsv; break }
+                'PCP'               { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'Proxy'             { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'PVP'               { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'RequestScript'     { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'RequestServer'     { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'Role'              { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'SSHKeyPairPolicy'  { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'TargetAccount'     { $failed= Import-SymTargetAccount -InputCsv $InputCsv; break }
+                'TargetApplication' { $failed= Import-SymTargetApplication -InputCsv $InputCsv; break }
+                'TargetServer'      { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'UserGroup'         { $failed= Import-SymUserGroup -InputCsv $InputCsv; break }
                 'Vault'             { }
                 'VaultSecret'       { }
             }

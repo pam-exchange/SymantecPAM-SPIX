@@ -26,12 +26,12 @@ SOFTWARE.
 #--------------------------------------------------------------------------------------
 function Unprotect-SymPassword (
     [Parameter(Mandatory=$true)][String] $EncryptedPassword,
-    [Parameter(Mandatory=$true)][string] $Key
+    [Parameter(Mandatory=$true)][string] $Passphrase
 )
 {
 	process {
         $cipher= $EncryptedPassword.Substring(5)
-        $pln= _Decrypt-PBKDF2 -CipherBase64 $cipher -Password $Key
+        $pln= _Decrypt-PBKDF2 -CipherBase64 $cipher -Password $Passphrase
         return $pln
     }
 }

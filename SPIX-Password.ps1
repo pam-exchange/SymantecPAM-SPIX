@@ -31,7 +31,7 @@ param (
 
     [AllowEmptyString()]
     [AllowNull()]
-    [string] $Key
+    [string] $Passphrase
 )
 
 # ----------------------------------------------------------------------------------
@@ -63,22 +63,22 @@ process {
 
     try {
         #
-        # Prompt for passphrase when "-ShowPassword -key ''" is used
+        # Prompt for passphrase when "-ShowPassword -Passphrase ''" is used
         #
-        if (!$key -or $PSBoundParameters.ContainsKey('Key')) {
+        if (!$Passphrase -or $PSBoundParameters.ContainsKey('Passphrase')) {
             # Key parameter WAS passed
-            if ([string]::IsNullOrWhiteSpace($Key)) {
-                $key= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+            if ([string]::IsNullOrWhiteSpace($Passphrase)) {
+                $Passphrase= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
                     [Runtime.InteropServices.Marshal]::SecureStringToBSTR(
                         (Read-Host "Enter encryption passphrase" -AsSecureString)
                     )
                 ))
-                $key2= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+                $Passphrase2= ([Runtime.InteropServices.Marshal]::PtrToStringBSTR(
                     [Runtime.InteropServices.Marshal]::SecureStringToBSTR(
                         (Read-Host "Confirm encryption passphrase" -AsSecureString)
                     )
                 ))
-                if ($key -cne $key2) {
+                if ($Passphrase -cne $Passphrase2) {
                     Write-Host "Encryption passphrase does not match." -ForegroundColor Yellow
                     return
                 }
@@ -86,11 +86,11 @@ process {
         }
 
         if ($password) {
-            $EncryptedPassword= Protect-SymPassword -Password $Password -Key $key
+            $EncryptedPassword= Protect-SymPassword -Password $Password -Passphrase $Passphrase
             Write-Host $EncryptedPassword
         }
         else {
-            $Password= Unprotect-SymPassword -EncryptedPassword $EncryptedPassword -Key $Key
+            $Password= Unprotect-SymPassword -EncryptedPassword $EncryptedPassword -Passphrase $Passphrase
             Write-Host $password
         }
 

@@ -26,11 +26,11 @@ SOFTWARE.
 #--------------------------------------------------------------------------------------
 function Protect-SymPassword (
     [Parameter(Mandatory=$true)][String] $Password,
-    [Parameter(Mandatory=$true)][string] $Key
+    [Parameter(Mandatory=$true)][string] $Passphrase
 )
 {
 	process {
-        $enc= _Encrypt-PBKDF2 -PlainText $Password -Password $Key
+        $enc= _Encrypt-PBKDF2 -PlainText $Password -Password $Passphrase
         return "{enc}"+$enc
     }
 }

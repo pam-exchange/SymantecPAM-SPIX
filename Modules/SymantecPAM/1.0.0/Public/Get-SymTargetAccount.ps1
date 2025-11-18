@@ -66,7 +66,7 @@ function Get-SymTargetAccount ()
         $TargetServerName,
 
         #[switch] $ShowPassword= $false,
-        #[AllowEmptyString()][string] $Key= "",
+        #[AllowEmptyString()][string] $Passphrase= "",
         
 		[Parameter(Mandatory=$false)][switch] $Refresh= $false,
         [Parameter(Mandatory=$false)][switch] $useRegex= $false,

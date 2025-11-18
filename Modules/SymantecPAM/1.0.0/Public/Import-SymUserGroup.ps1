@@ -25,7 +25,7 @@ SOFTWARE.
 #--------------------------------------------------------------------------------------
 
 
-function Merge-SymUserGroup (
+function Import-SymUserGroup (
     [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv
 )
 {

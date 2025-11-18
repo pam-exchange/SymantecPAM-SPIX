@@ -34,13 +34,13 @@ function _Encrypt-PBKDF2 {
     [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($salt)
 
     $pbkdf = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($Password, $salt, 100000)
-    $key = $pbkdf.GetBytes(32)   # AES-256 key
+    $Passphrase = $pbkdf.GetBytes(32)   # AES-256 key
 
     $aes = [System.Security.Cryptography.Aes]::Create()
     $aes.KeySize = 256
     $aes.Mode    = "CBC"
     $aes.Padding = "PKCS7"
-    $aes.Key     = $key
+    $aes.Key     = $Passphrase
     $aes.GenerateIV()
     $iv = $aes.IV
 
@@ -64,13 +64,13 @@ function _Decrypt-PBKDF2 {
     $cipherBytes = $combined[32..($combined.Length-1)]
 
     $pbkdf = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($Password, $salt, 100000)
-    $key = $pbkdf.GetBytes(32)
+    $Passphrase = $pbkdf.GetBytes(32)
 
     $aes = [System.Security.Cryptography.Aes]::Create()
     $aes.KeySize = 256
     $aes.Mode    = "CBC"
     $aes.Padding = "PKCS7"
-    $aes.Key     = $key
+    $aes.Key     = $Passphrase
     $aes.IV      = $iv
 
     $decryptor = $aes.CreateDecryptor()
