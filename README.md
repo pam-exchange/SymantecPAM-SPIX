@@ -79,12 +79,17 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 | &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
 | &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account to export. Wildcard `*` can be used. |  
 | &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is fetched.|  
-| &#8209;Key&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
-| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
+| &#8209;Passphrase&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
+| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file. |  
 | &#8209;Quiet | Less output when running SPIX |  
 
 
 When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after SPIX has completed its export of target account passwords. It can be deleted manually and will be created next time SPIX is exporting target account passwords.
+
+Available values for **extensionType** are:  
+activeDirectorySshKey, AS400, AwsAccessCredentials, AwsApiProxyCredentials, AzureAccessCredentials, CiscoSSH, Generic, genericSecretType, HPServiceManager, juniper, ldap, mssql, mssqlAzureMI, nsxcontroller, nsxmanager, nsxproxy, oracle, PaloAlto, RadiusTacacsSecret, remedy, ServiceDeskBroker, ServiceNow, SPML2, sybase, unixII, vcf, vmware, weblogic10, windows, windowsDomainService, windowsRemoteAgent, windowsSshKey, windowsSshPassword, XsuiteApiKey
+
+**plus** any Custom Connectors available in PAM.
 
 
 ### Examples
