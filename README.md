@@ -55,18 +55,25 @@ By default the SPIX.ps1 script will look for the file in the current directory.
 
 ## Help
 
-SPIX **-Help**
+```
+SPIX -Help
+```
+
+Will show a brief description of parameters.
+
 
 ## Export
 
-SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Key \<passphrase>] [-Delimiter \<character>] [-Quiet]
+```
+SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-SrvName <filter>] [-AppName <filter>] [-AccName <filter>] [-ExtensionType <name>] [-ShowPassword] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
+```
 
 
 | Parameter | Description |
 | :---- | :---- |
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;OutputPath&nbsp;\<path> | Path where exported files are stored. Default is `.\SPIX-output`. |
-| &#8209;Category&nbsp;\<category> | One or more categories to export. Available options are<br/>**ALL**<br/>**Target**<br/>- TargetServer<br/>- TargetApplication<br/>- TargetAccount<br/>**A2A**<br/>- RequestServer<br/>- RequestScript<br/>- Authorization<br/>- Proxy<br/>**Policy**<br/>- PCP<br/>- PVP<br/>- JIT or CustomWorkflow<br/>- SSHKeyPairPolicy<br/>**UserGroup**<br/>- User<br/>- Role<br/>- Filter<br/>- Group<br/>**Secret**<br/>- Vault<br/>- VaultSecret<br/>AccessPolicy<br/>Service<br/>Device |
+| &#8209;Category&nbsp;\<category> | One or more categories to export. Available options are<br/>**ALL**<br/>**Target** --> TargetServer, TargetApplication, TargetAccount<br/>**A2A** --> RequestServer, RequestScript, Authorization, Proxy<br/>**Policy** --> PCP, PVP, JIT or CustomWorkflow, SSHKeyPairPolicy<br/>**UserGroup** --> UserGroup, User, Role, Filter, Group<br/>**Secret** --> Vault, VaultSecret<br/>**AccessPolicy**<br/>**Service**<br/>**Device** |
 | &#8209;SrvName&nbsp;\<filter> | Used with Category `Target`, `TargetServer`, `TargetApplication` and `TargetAccount`.<br/>Specify a hostname for the target server. Wildcard `*` can be used. |  
 | &#8209;AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name for the target application. Wildcard `*` can be used. |  
 | &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
@@ -135,7 +142,9 @@ Export target account where the extension type is 'windowsDomainService' and the
 
 ## Import
 
-SPIX **-Import** [-ConfigPath \<path>] [-InputFile \<filename>] [-Synchronize] [-UpdatePassword] [-Key \<passphrase>] [-Delimiter \<character>] [-Quiet]
+```
+SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-Synchronize] [-UpdatePassword] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
+```
 
 
 | Parameter | Description |
