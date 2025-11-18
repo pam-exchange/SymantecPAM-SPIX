@@ -102,7 +102,7 @@ Run time: 2 seconds
 Done
 PS W:\>
 ```
-
+ 
 
 ```
 PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Key ""
