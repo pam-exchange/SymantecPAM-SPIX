@@ -79,7 +79,7 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 | &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
 | &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account to export. Wildcard `*` can be used. |  
 | &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is fetched.|  
-| &#8209;Passphrase&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
+| &#8209;Passphrase&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `passphrase` is empty "", the user is prompted to enter a passphrase.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file. |  
 | &#8209;Quiet | Less output when running SPIX |  
 
@@ -117,7 +117,6 @@ Exporting TargetAccount
 ... windowsSshPassword
 Run time: 2 seconds
 Done
-PS W:\>
 ```
 
 The command above will fetch **Targets**, i.e. TargetServer, TargetApplication and TargetAccount, but only where the extensionType starts with 'windows'.
@@ -135,7 +134,6 @@ Exporting TargetApplication
 Exporting PCP
 Run time: 1 seconds
 Done
-PS W:\>
 ```
 
 The command above will fetch **TargetServer**, **TargetApplication** and **PCP**, but TargetApplication only where the extensionType starts with 'windows'.
@@ -147,7 +145,6 @@ Exporting TargetAccount
 ... windowsDomainService
 Run time: 2 seconds
 Done
-PS W:\>
 ```
 
 The exported passwords must be encrypted (-key option), but no passphrase is given on hte command line. SPIX will prompt the user to enter a passphrase and confirm it before proceeding. The passphrase is hashed and the hash is used as encryption key. The encryption itself uses random salt value, such that two exports of the same account password will have different encrypted text.
@@ -158,10 +155,23 @@ Exporting TargetAccount
 ... windowsDomainService
 Run time: 2 seconds
 Done
-PS W:\>
 ```
 
 Export target account where the extension type is 'windowsDomainService' and the application name contains the word 'breakglass'.
+
+```
+PS W:\> .\SPIX.ps1 -export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Passphrase ''
+Enter encryption passphrase: ***********
+Confirm encryption passphrase: ***********
+Exporting TargetAccount
+... windowsDomainService
+Run time: 12 seconds
+Done
+```
+
+Export accounts using -ShowPassword without having a passphrase on the command line. If a passphrase is provided on the command line, the user is not prompted to enter a passphrase.  
+Note that when using Powershell 5.1 a pop-up window is shown when entering the passphrase.
+
 
 
 ## Import
@@ -177,7 +187,7 @@ SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-Synchronize] [-Updat
 | &#8209;InputFile&nbsp;\<filename> | Filename with import information. |
 | &#8209;Synchronize | Flag used when creating new accounts. PAM will try to synchronize the account when it is added. |  
 | &#8209;UpdatePassword | Flag used when creating new accounts. PAM will set the account password to a new random value according to the PCP used for the target application. |  
-| &#8209;Key&nbsp;\<passphrase> | Used when updating existing accounts. The password in hte import file is encrypted using the passphrase given. If the `encryptionn passphrase` is empty "", the user is prompted to enter a password. |  
+| &#8209;Passphrase&nbsp;\<passphrase> | Used when updating existing accounts. The password in the import file is encrypted using the passphrase given. If the `passphrase` is empty "", the user is prompted to enter a passphrase. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
 | &#8209;Quiet | Less output when running SPIX |  
 
