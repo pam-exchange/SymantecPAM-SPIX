@@ -86,10 +86,10 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 
 When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after SPIX has completed its export of target account passwords. It can be deleted manually and will be created next time SPIX is exporting target account passwords.
 
-Available values for **extensionType** are:  
+Available values for **extensionType** are the built-in connectors:  
 activeDirectorySshKey, AS400, AwsAccessCredentials, AwsApiProxyCredentials, AzureAccessCredentials, CiscoSSH, Generic, genericSecretType, HPServiceManager, juniper, ldap, mssql, mssqlAzureMI, nsxcontroller, nsxmanager, nsxproxy, oracle, PaloAlto, RadiusTacacsSecret, remedy, ServiceDeskBroker, ServiceNow, SPML2, sybase, unixII, vcf, vmware, weblogic10, windows, windowsDomainService, windowsRemoteAgent, windowsSshKey, windowsSshPassword, XsuiteApiKey
 
-**plus** any Custom Connectors available in PAM.
+**plus** all Custom Connectors available in PAM.
 
 
 ### Examples
@@ -121,6 +121,25 @@ PS W:\>
 ```
 
 The command above will fetch **Targets**, i.e. TargetServer, TargetApplication and TargetAccount, but only where the extensionType starts with 'windows'.
+
+
+```
+PS W:\> .\SPIX.ps1 -Export -Category TargetServer,TargetApplication,PCP -ExtensionType windows*
+Exporting TargetServer
+Exporting TargetApplication
+... windows
+... windowsDomainService
+... windowsRemoteAgent
+... windowsSshKey
+... windowsSshPassword
+Exporting PCP
+Run time: 1 seconds
+Done
+PS W:\>
+```
+
+The command above will fetch **TargetServer**, **TargetApplication** and **PCP**, but TargetApplication only where the extensionType starts with 'windows'.
+
 
 ```
 PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Key ""

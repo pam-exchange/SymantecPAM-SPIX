@@ -34,7 +34,7 @@ param (
 
     [Parameter(Mandatory=$true,ParameterSetName='Export')][switch] $Export= $false,
     [Parameter(ParameterSetName='Export')][string] $OutputPath= '.\SPIX-output',
-    [Parameter(ParameterSetName='Export')][string] $Category= 'ALL',
+    [Parameter(ParameterSetName='Export')][string[]] $Category= 'ALL',
     [Parameter(ParameterSetName='Export')][switch] $ShowPassword= $false,
     [Parameter(ParameterSetName='Export')][string] $SrvName= '',
     [Parameter(ParameterSetName='Export')][string] $AppName= '',
