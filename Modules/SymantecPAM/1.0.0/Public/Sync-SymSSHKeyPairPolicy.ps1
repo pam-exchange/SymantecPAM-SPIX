@@ -33,15 +33,18 @@ function Sync-SymSSHKeyPairPolicy ()
 	process {
         if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        if ($null -eq $params.name -or $params.name -eq "") {
-            throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-        }
-
         try {
-            # Get current object (update) or fail (new)
-            $current= Get-SymSSHKeyPairPolicy -name $params.name -Single -NoEmptySet
+            if ($params.action -match 'update|remove') {
+                $current= Get-SymSSHKeyPairPolicy -ID $params.ID -Single -NoEmptySet
+            }
 
             if ($params.action -eq 'new') {
+                if (!$params.name) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                $current= Get-SymSSHKeyPairPolicy -name $params.name -Single -NoEmptySet
+
                 $details= $DETAILS_EXCEPTION_DUPLICATE_SSHKEYPAIR_01 -f $params.name
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
             }

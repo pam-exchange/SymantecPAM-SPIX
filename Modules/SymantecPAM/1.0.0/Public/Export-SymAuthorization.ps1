@@ -51,14 +51,17 @@ function Export-SymAuthorization (
         # Map internal IDs to names
         #
         foreach ($obj in $filteredList) {
-            $obj | Add-Member -MemberType NoteProperty -Name 'targetGroup' -Value '' -Force
-            $obj | Add-Member -MemberType NoteProperty -Name 'requestGroup' -Value '' -Force
 
-            if ($obj.TargetGroupID -ne -1)   { $obj.targetGroup= (Get-SymGroup -ID $obj.TargetGroupID).Name }
-            if ($obj.requestGroupID -ne -1)  { $obj.requestGroup= (Get-SymGroup -ID $obj.requestGroupID).Name }
-            if ($obj.requestServerID -ne -1) { $obj.RequestServer= (Get-SymRequestServer -ID $obj.requestServerID).Hostname }
-            if ($obj.targetAliasID -ne -1)   { $obj.targetAlias= (Get-SymTargetAlias -ID $obj.targetAliasID).name }
-            if ($obj.scriptID -ne -1)        { $obj.script= (Get-SymRequestScript -ID $obj.scriptID).Name }
+            $obj | Add-Member -MemberType NoteProperty -Name 'Target' -Value '' -Force
+            $obj | Add-Member -MemberType NoteProperty -Name 'Request' -Value '' -Force
+
+            if ($obj.TargetGroupID -ne -1)   { $obj.Target= "("+$((Get-SymGroup -ID $obj.TargetGroupID -NoEmptySet).Name)+")" }
+            if ($obj.TargetAliasID -ne -1)   { $obj.Target= (Get-SymTargetAlias -ID $obj.targetAliasID -NoEmptySet).name }
+
+            if ($obj.RequestGroupID -ne -1)  { $obj.Request= "("+$((Get-SymGroup -ID $obj.requestGroupID -NoEmptySet).Name)+")" }
+            if ($obj.RequestServerID -ne -1) { $obj.Request= (Get-SymRequestServer -ID $obj.requestServerID -NoEmptySet).Hostname }
+
+            if ($obj.ScriptID -ne -1)        { $obj.script= (Get-SymRequestScript -ID $obj.scriptID -NoEmptySet).Name }
         }
 
         #>

@@ -81,7 +81,12 @@ function _Invoke-SymantecCLI () {
             throw (New-Object SymantecPamException($EXCAPTION_MISSING_TCF, $details))
         }
         else {
-            $details= $res.DocumentElement.statusMessage
+            if ($res.'cw.appMessage'.content.'#cdata-section' -match "<cr\.statusDescription>(.*)</cr.statusDescription>") {
+                $details= $Matches[1]
+            }
+            else {
+                $details= $res.DocumentElement.statusMessage
+            }
             throw (New-Object SymantecPamException($EXCEPTION_INVALID_PARAMETER, $details))
         }
 

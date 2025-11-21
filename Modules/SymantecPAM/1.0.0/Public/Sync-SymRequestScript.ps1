@@ -33,15 +33,18 @@ function Sync-SymRequestScript ()
 	process {
         if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        if ($null -eq $params.name -or $params.name -eq "") {
-            throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-        }
-
         try {
-            # Get current object (update) or fail (new)
-            $current= Get-SymRequestScript -name $params.name -Single -NoEmptySet
+            if ($params.action -match 'update|remove') {
+                $current= Get-SymRequestScript -ID $params.ID -Single -NoEmptySet
+            }
 
             if ($params.action -eq 'new') {
+                if (!$params.name) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                $current= Get-SymRequestScript -name $params.name -Single -NoEmptySet
+
                 $details= $DETAILS_EXCEPTION_DUPLICATE_REQUESSCRIPT_01 -f $params.name
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
             }

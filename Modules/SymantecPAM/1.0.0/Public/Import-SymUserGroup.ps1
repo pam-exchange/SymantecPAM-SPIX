@@ -31,7 +31,6 @@ function Import-SymUserGroup (
 {
 	process {
         $failedImport= New-Object System.Collections.ArrayList
-
         foreach ($row in $InputCsv) {
             try {
                 if ($row.Action -notmatch "^(Update|New)$") {
@@ -57,13 +56,8 @@ function Import-SymUserGroup (
                 $res= Sync-SymUserGroup -params $params
             }
             catch {
-                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)"
-                if ($FailedInputFile) {
-                    $row | Export-Csv -Path $FailedInputFile -Delimiter $Delimiter -Append -NoTypeInformation
-                }
-                else {
-                    $failedImport.add( $row ) | Out-Null
-                }
+                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)" -Force
+                $failedImport.add( $row ) | Out-Null
             }
         }
         return $failedImport

@@ -128,7 +128,7 @@ function Export-Sym (
                 if (!$Quiet) {Write-Host "Exporting TargetAccount"}
                 $targetAccount = Get-SymTargetAccount -srvName $srvName -appName $appName -accName $accName -ExtensionType $ExtensionType
                 $fixedColumns = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','targetApplicationName','username','password')
-                $ignoreColums = @('cacheAllowed','cacheBehaviorInt','compoundAccount','compoundServerIDs','ownerUserID','passwordViewPolicyID','parentAccountId','Privileged','ServerkeyID','TargetApplication','TargetApplicationID','TargetServerAlias','TargetServerID')
+                $ignoreColums = @('cacheAllowed','cacheBehaviorInt','compoundAccount','compoundServerIDs','ownerUserID','passwordViewPolicyID','parentAccountId','Privileged','ServerkeyID','TargetApplication','TargetApplicationID','TargetServerAlias','TargetServerID','Attribute.useOtherAccountToChangePassword')
                 Export-SymTargetAccount -List $targetAccount -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -ShowPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
             }
 
@@ -154,8 +154,8 @@ function Export-Sym (
             {    
                 if (!$Quiet) {Write-Host "Exporting Authorization"}
                 $authorization= Get-SymAuthorization
-                $fixedColumns= @('ID','ObjectType','Action','targetGroup','targetAlias','script','requestServer','requestGroup','checkExecutionID','executionUser')
-                $ignoreColums= @('requestGroupID','requestServerID','scriptID','targetAliasID','targetGroupID')
+                $fixedColumns= @('ID','ObjectType','Action','Target','Request','Script','checkExecutionID','executionUser')
+                $ignoreColums= @('targetAlias','requestGroupID','requestServerID','scriptID','targetAliasID','targetGroupID','requestServer')
                 Export-SymAuthorization -List $authorization -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath
             }
 

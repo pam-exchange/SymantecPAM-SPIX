@@ -33,15 +33,18 @@ function New-SymTargetServer ()
 	process {
         if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        if ($null -eq $params.hostName -or $params.hostName -eq "") {
-            throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-        }
-
         try {
-            # Get current object (update) or fail (new)
-            $current= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
+            if ($params.action -match 'update|remove') {
+                $current= Get-SymTargetServer -ID $params.ID -Single -NoEmptySet
+            }
 
             if ($params.action -eq 'new') {
+                if (!$params.hostName) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'HostName'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                $current= Get-SymTargetServer -Hostname $params.hostname -NoEmptySet
+
                 $details= $DETAILS_EXCEPTION_DUPLICATE_SERVER_01 -f $params.hostname
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
             }

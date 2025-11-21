@@ -35,29 +35,29 @@ function Sync-SymTargetAccount ()
 
         $srv= $null
         $app= $null
-        $srvID= $null
-        $appID= $null
         try {
-            if ($Params.hostname) {
-                $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
-                $srvID= $srv.ID
+            if ($params.action -match 'update|remove') {
+                $current= Get-SymTargetAccount -ID $params.ID -Single -NoEmptySet
             }
-            if (!$srvID) {
-                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-            }
-
-            if ($Params.TargetApplicationName) {
-                $app= Get-SymTargetApplication -TargetServerID $srvID -Name $params.TargetApplicationName -Single -NoEmptySet
-                $appID= $app.ID
-            }
-            if (!$appID) {
-                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-            }
-
-            # Get current object (update) or fail (new)
-            $current= Get-SymTargetAccount -TargetApplicationID $appID -userName $params.userName -Single -NoEmptySet
 
             if ($params.action -eq 'new') {
+                if (!$Params.hostname) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                if (!$params.TargetApplicationName) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'TargetApplicationName'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                if (!$params.userName) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'userName'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+
+                $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
+                $app= Get-SymTargetApplication -TargetServerID $srv.ID -Name $params.TargetApplicationName -Single -NoEmptySet
+                $current= Get-SymTargetAccount -TargetApplicationID $app.ID -userName $params.userName -Single -NoEmptySet
+
                 $details= $DETAILS_EXCEPTION_DUPLICATE_APPL_01 -f $params.hostname, $params.TargetApplicationName
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
             }
@@ -67,10 +67,10 @@ function Sync-SymTargetAccount ()
             }
         }
 
-        if (!$app) {$app= Get-SymTargetApplication -ID $obj.TargetApplicationID}
-        $isBuiltInExtensionType= _isBuiltInExtensionType($app.type)
+        if (!$app) {$app= Get-SymTargetApplication -ID $current.TargetApplicationID -NoEmptySet}
+        #$isBuiltInExtensionType= _isBuiltInExtensionType($app.type)
 
-        if (!$srv) {$srv= Get-SymTargetServer -ID $ta.TargetServerID}
+        if (!$srv) {$srv= Get-SymTargetServer -ID $app.TargetServerID -NoEmptySet}
 
 
 		#
@@ -81,11 +81,11 @@ function Sync-SymTargetAccount ()
         if ($params.action -match '(update|remove)') { $newParams+= @{ 'TargetAccount.ID'= $current.ID } }
 
         if ($params.action -match '(new|update)') {
-            $newParams+= @{'TargetApplication.ID'= $appID}
+            $newParams+= @{'TargetApplication.ID'= $app.ID}
 
             if ($Params.userName) {$newParams+= @{'TargetAccount.userName'= $params.userName}}
             if ($Params.password) {$newParams+= @{'TargetAccount.password'= $params.password}}
-            if ($Params.PasswordViewPolicy) {$newParams+= @{'PasswordViewPolicy.name'= $params.PasswordViewPolicy}}
+            if ($Params.PasswordViewPolicy) {$newParams+= @{'TargetAccount.PasswordViewPolicyID'= (Get-SymPVP -Name $params.PasswordViewPolicy).ID}}
 
             $newParams+= @{'TargetAccount.privileged'= 'true'}
             if ($Params.cacheBehavior -or $params.cacheDuration -or $params.aliases) {
@@ -116,16 +116,6 @@ function Sync-SymTargetAccount ()
             foreach ($p in $($params.PSobject.Properties | Where-Object {$_.Name -like 'Attribute*'})) {
                 if ($p.value -match '^(TRUE|FALSE)$') {$p.value = $p.value.toLower()} 
                 $newParams+= @{ $p.Name= $p.value }
-            }
-
-            # Must always use for built-in extensionType
-            if ($isBuiltInExtensionType) {
-                if (!$newParams.ContainsKey('Attribute.useOtherAccountToChangePassword')) {
-                    $newParams+= @{'Attribute.useOtherAccountToChangePassword'= 'false'}
-                }
-                if ($newParams.'Attribute.otherAccount') {
-                    $newParams.'Attribute.useOtherAccountToChangePassword'= 'true'
-                }
             }
         }
 

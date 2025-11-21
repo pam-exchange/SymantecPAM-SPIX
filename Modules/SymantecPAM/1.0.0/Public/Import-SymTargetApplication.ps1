@@ -150,15 +150,8 @@ function Import-SymTargetApplication (
                 $res= Sync-SymTargetApplication -params $params
             }
             catch {
-                #if (!$row.ErrorMessage) {$row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "" -Force}
-                #$row.ErrorMessage= "$($_.Exception.Message) -- $($_.Exception.Details)"
                 $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)" -Force
-                if ($FailedInputFile) {
-                    $row | Select-object ErrorMessage,* -ExcludeProperty Status | Export-Csv -Path $FailedInputFile -Delimiter $Delimiter -Append -NoTypeInformation
-                }
-                else {
-                    $failedImport.add( $row ) | Out-Null
-                }
+                $failedImport.add( $row ) | Out-Null
             }
         }
         return $failedImport

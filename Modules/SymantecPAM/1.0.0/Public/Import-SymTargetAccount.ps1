@@ -45,335 +45,104 @@ function Import-SymTargetAccount (
                 $params= $row | Select-Object * -ExcludeProperty cacheAllow,ObjectType,deviceName,PasswordVerified,'Attribute.isProvisionedAccount'
 
                 switch($params.extensionType) {
+
+                {'AwsAccessCredentials','AS400','CiscoSSH','HPServiceManager','juniper','ldap','mssql','mssqlAzureMI',
+                 'mysql','oracle','PaloAlto','remedy','ServiceDeskBroker','SPML2','sybase','unixII','vmware','weblogic10',
+                 'windows','windowsDomainService','windowsRemoteAgent','XsuiteApiKey' -eq $_} 
+                {
+                    if ($params.'Attribute.otherAccount') {
+                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'Attribute.otherAccount')
+                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'true' -Force
+                    } else {
+                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false' -Force
+                    }
+                    # break <-- no break here
+                }
+
+                {'juniper','SPML2','sybase','unixII','vmware','weblogic10','windowsDomainService','windowsRemoteAgent','XsuiteApiKey' -eq $_} 
+                {
+                    $params | Add-Member -NotePropertyName 'Attribute.extensionType' -NotePropertyValue $params.extensionType -Force
+                    # break <-- no break here
+                }
+
+                {'activeDirectorySshKey','vcf' -eq $_} {
+                    if ($params.'Attribute.anotherAccount') {
+                        $params.'Attribute.anotherAccount'= _decodeOtherAccount($params.'Attribute.anotherAccount')
+                    }
+                    break
+                }
+
                 'AwsAccessCredentials' {
                     if ($params.'Attribute.awsCredentialType') {$params.'Attribute.awsCredentialType'= $params.'Attribute.awsCredentialType'.ToUpper()}
-                    #$params.'Attribute.passphrase'
-                    #$params.'Attribute.awsKeyPairName'
-                    #$params.'Attribute.accountFriendlyName'
-                    #$params.'Attribute.awsAccessKeyAlias'
-                    #$params.'Attribute.awsAccessRole'
-                    #$params.'Attribute.awsCloudType'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
                     break
                 }
-                'AS400' {
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'CiscoSSH' {
-                    #$params.'Attribute.protocol'
-                    #$params.'Attribute.protocol'
-                    #$params.'Attribute.pwType'
-                    #$params.'Attribute.changeAuxLoginPassword'
-                    #$params.'Attribute.changeConsoleLoginPassword'
-                    #$params.'Attribute.changeVtyLoginPassword'
-                    #$params.'Attribute.numVTYPorts'
 
-                    if (!$params.'Attribute.useOtherPrivilegedAccount') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherPrivilegedAccount' -NotePropertyValue 'false'
-                    }
+                'CiscoSSH' {
+                    if ($params.'Attribute.protocol') {$params.'Attribute.protocol'= $params.'Attribute.protocol'.ToUpper()}
+                    if ($params.'Attribute.pwType') {$params.'Attribute.pwType'= $params.'Attribute.pwType'.ToLower()}
+                    
                     if ($params.'Attribute.otherPrivilegedAccount') {
                         $params.'Attribute.otherPrivilegedAccount'= _decodeOtherAccount($params.'Attribute.otherPrivilegedAccount')
-                        $params.'Attribute.useOtherPrivilegedAccount'= 'true'
+                        $params | Add-Member -NotePropertyName 'Attribute.useOtherPrivilegedAccount' -NotePropertyValue 'true' -Force
                     } else {
-                        $params.'Attribute.useOtherPrivilegedAccount'= 'false'
+                        $params | Add-Member -NotePropertyName 'Attribute.useOtherPrivilegedAccount' -NotePropertyValue 'false' -Force
                     }
+                    break
+                }
 
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'HPServiceManager' {
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'juniper' {
-                    $params.'Attribute.extensionType'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'ldap' {
-                    $params.'Attribute.userDN'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'mssql' {
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'mssqlAzureMI' {
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'mysql' {
-                    $params.'Attribute.schema'
-                    $params.'Attribute.hostNameQualifier'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'oracle' {
-                    #$params.'Attribute.schema'
-                    #$params.'Attribute.useOid'
-                    #$params.'Attribute.sid'
-                    #$params.'Attribute.cn'
-                    #$params.'Attribute.racService'
-                    #$params.'Attribute.sysdbaAccount'
-                    #$params.'Attribute.replaceSyntax'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'PaloAlto' {
-                    #$params.'Attribute.protocol'
-                    #$params.'Attribute.pwType'
-                    #$params.'Attribute.useOtherAccountToChangePassword'
-                    #$params.'Attribute.otherPrivilegedAccount'
-                    #$params.'Attribute.changeAuxLoginPassword'
-                    #$params.'Attribute.changeConsoleLoginPassword'
-                    #$params.'Attribute.changeVtyLoginPassword'
-                    #$params.'Attribute.numVTYPorts'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'SPML2' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'sybase' {
-                    #$params.'Attribute.schema'
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
                 'unixII' {
-                    #$params.'Attribute.verifyThroughOtherAccount'
-                    #$params.'Attribute.passwordChangeMethod'
-                    #$params.'Attribute.protocol'
-                    #$params.'Attribute.publicKey'
-                    #$params.'Attribute.keyOptions'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
+                    if ($params.'Attribute.passwordChangeMethod') {$params.'Attribute.passwordChangeMethod'= $params.'Attribute.passwordChangeMethod'.ToUpper()}
+                    if ($params.'Attribute.protocol') {$params.'Attribute.protocol'= $params.'Attribute.protocol'.ToUpper()}
                     break
                 }
-                'vmware' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'weblogic10' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    #$params.'Attribute.realm'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
-                'windowsDomainService' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    #$params.'Attribute.userDN'
-                    #$params.'Attribute.serviceInfo'
-                    #$params.'Attribute.tasks'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
-                    break
-                }
+
                 'windowsRemoteAgent' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    #$params.'Attribute.accountType'
-                    #$params.'Attribute.serviceInfo'
-                    #$params.'Attribute.tasks'
-                    #$params.'Attribute.forcePasswordChange'
-                    if (!$params.'Attribute.useOtherAccountToChangePassword') {
-                        $params | Add-Member -NotePropertyName 'Attribute.useOtherAccountToChangePassword' -NotePropertyValue 'false'
-                    }
-                    if ($params.'Attribute.otherAccount') {
-                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'otherAccount')
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'true'
-                    } else {
-                        $params.'Attribute.useOtherAccountToChangePassword'= 'false'
-                    }
+                    if ($params.'Attribute.accountType') {$params.'Attribute.accountType'= $params.'Attribute.accountType'.ToLower()}
                     break
                 }
+
                 'windowsSshKey' {
-                    $params.'Attribute.extensionType'= $params.extensionType
-                    #$params.'Attribute.changeProcess'
+                    if ($params.'Attribute.changeProcess') {$params.'Attribute.changeProcess'= $params.'Attribute.changeProcess'.ToUpper()}
+                    if ($params.'Attribute.protocol') {$params.'Attribute.protocol'= $params.'Attribute.protocol'.ToUpper()}
                     break
                 }
 
-                <#
-                'AwsAccessCredentials' {break}
-                'Generic' {break}
-                'nsxcontroller' {break}
-                'nsxmanager' {break}
-                'nsxproxy' {break}
-                'RadiusTacacsSecret' {break}
-                'remedy' {break}
-                'ServiceDeskBroker' {break}
-                'ServiceNow' {break}
-                'vcf' {break}
-                'windows' {break}
-                'windowsSshPassword' {break}
-                'XsuiteApiKey' {break}
-                #>
+                'windowsSshPassword' {
+                    if ($params.'Attribute.changeProcess') {$params.'Attribute.changeProcess'= $params.'Attribute.changeProcess'.ToUpper()}
+                    break
+                }
 
+                'XsuiteApiKey' {
+                    # PAM 4.3 - ApiKey cannot be added as synchronized
+                    if ($params.synchronize) {$params.synchronize= 'false'}
+                }
                 } # end switch
 
                 # 
                 # Some TCF connectors may use 'loginAccount' 
                 #
-                if ($params.'Attribute.loginAccount') {
-                    $params.'Attribute.loginAccount'= _decodeOtherAccount($params.'Attribute.loginAccount')
+                if (-not $(_isBuiltInExtensionType($params.extensionType))) {
+                    if ($params.'Attribute.loginAccount' -match '\|') {
+                        $params.'Attribute.loginAccount'= _decodeOtherAccount($params.'Attribute.loginAccount')
+                    }
+                    if ($params.'Attribute.otherAccount' -match '\|') {
+                        $params.'Attribute.otherAccount'= _decodeOtherAccount($params.'Attribute.otherAccount')
+                    }
                 }
 
                 #
                 # Decrypt password
                 #
                 if ($params.password -and $params.password.StartsWith('{enc}')) {
-                    $params.password= _Decrypt-PBKDF2 -CipherBase64 $params.password -Password $Passphrase
+                    $params.password= _Decrypt-PBKDF2 -CipherBase64 $params.password.substring(5) -Password $Passphrase
                 }
 
                 # Update/New/Remove from PAM
                 $res= Sync-SymTargetAccount -params $params
             }
             catch {
-                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)"
-                if ($FailedInputFile) {
-                    $row | Select-object ErrorMessage,* -ExcludeProperty Status | Export-Csv -Path $FailedInputFile -Delimiter $Delimiter -Append -NoTypeInformation
-                }
-                else {
-                    $failedImport.add( $row ) | Out-Null
-                }
+                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)" -Force
+                $failedImport.add( $row ) | Out-Null
             }
         }
         return $failedImport

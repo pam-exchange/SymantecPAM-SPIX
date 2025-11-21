@@ -38,6 +38,7 @@ function Import-SymGeneric (
                 }
 
                 switch ($row.ObjectType) {
+                    'Authorization' { $res= Sync-SymAuthorization -params $row; break }
                     'RequestServer' { $res= Sync-SymRequestServer -params $row; break }
                     'RequestScript' { $res= Sync-SymRequestScript -params $row; break }
                     'TargetServer' { $res= Sync-SymTargetServer -params $row; break }
@@ -50,7 +51,7 @@ function Import-SymGeneric (
                 }
             }
             catch {
-                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)"
+                $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)" -Force
                 $failedImport.add( $row ) | Out-Null
             }
         }

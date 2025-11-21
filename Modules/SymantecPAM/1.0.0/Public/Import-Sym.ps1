@@ -29,7 +29,8 @@ function Import-Sym (
     [string] $Delimiter,
     [string] $Timestamp,
     [switch] $Synchronize= $false,
-    [switch] $UpdatePassword= $false
+    [switch] $UpdatePassword= $false,
+    [string] $Passphrase
 )
 {
 	process {
@@ -52,9 +53,9 @@ function Import-Sym (
 
         foreach ($type in $objectType) {
             switch ($type) {
-                'Authorization'     { }
-                'Filter'            { $failed= $null }
-                'Group'             { $failed= $null }
+                'Authorization'     { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
+                'Filter'            { }
+                'Group'             { }
                 'PCP'               { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'Proxy'             { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'PVP'               { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
@@ -62,7 +63,7 @@ function Import-Sym (
                 'RequestServer'     { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'Role'              { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'SSHKeyPairPolicy'  { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
-                'TargetAccount'     { $failed= Import-SymTargetAccount -InputCsv $InputCsv; break }
+                'TargetAccount'     { $failed= Import-SymTargetAccount -InputCsv $InputCsv -Passphrase $Passphrase; break }
                 'TargetApplication' { $failed= Import-SymTargetApplication -InputCsv $InputCsv; break }
                 'TargetServer'      { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'UserGroup'         { $failed= Import-SymUserGroup -InputCsv $InputCsv; break }
@@ -70,7 +71,7 @@ function Import-Sym (
                 'VaultSecret'       { }
             }
             if ($failed) {
-                Write-Host $failed.ErrorMessage -ForegroundColor Yellow
+                Write-Host "Import with errors. See the file '$FailedInputFile' for details." -ForegroundColor Yellow
                 $failed | Export-Csv -Path $FailedInputFile -Delimiter $Delimiter -Append -NoTypeInformation
             }
         }

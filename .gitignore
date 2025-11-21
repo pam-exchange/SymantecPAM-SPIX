@@ -1,4 +1,5 @@
 # Ignore 
 /SPIX-output
+/Testdata
 SPIX-Config-Complete.ps1
 SPIX-*.properties

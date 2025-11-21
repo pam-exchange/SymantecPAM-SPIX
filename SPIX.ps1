@@ -96,6 +96,10 @@ process {
 
         $Timestamp= $startTime.ToString('yyyyMMdd-HHmmss')
 
+        #$res= Get-SymAuthorization -RequestServer appserver*
+
+
+
         #
         # Prompt for passphrase when "-ShowPassword -Passphrase ''" is used
         #

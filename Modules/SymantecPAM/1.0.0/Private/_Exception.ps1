@@ -35,6 +35,8 @@ Set-Variable EXCEPTION_PASSWORD_UPDATE -Option Constant -Value "Password update 
 Set-Variable EXCEPTION_DUPLICATE -Option Constant -Value "Duplicate"
 Set-Variable EXCAPTION_MISSING_TCF -Option Constant -Value "Custom Connector not operational"
 
+Set-Variable DETAILS_EXCEPTION_INVALID_PARAMETER_01 -Option Constant -Value "Parameter '{0}' is missing"
+Set-Variable DETAILS_EXCEPTION_INVALID_PARAMETER_02 -Option Constant -Value "A parameter is incorrect"
 Set-Variable DETAILS_EXCEPTION_NOT_SINGLE_01 -Option Constant -Value "Multiple elements found when using parameter '-Single'"
 Set-Variable DETAILS_EXCEPTION_NOT_FOUND_01 -Option Constant -Value "Nothing found when using parameter '-NoEmptySet'"
 Set-Variable DETAILS_EXCEPTION_NOT_FOUND_PCP_01 -Option Constant -Value "PCP name '{0}' not found"
@@ -51,6 +53,8 @@ Set-Variable DETAILS_EXCEPTION_DUPLICATE_ROLE_01 -Option Constant -Value "Role '
 Set-Variable DETAILS_EXCEPTION_DUPLICATE_FILTER_01 -Option Constant -Value "Filter '{0}' already exist"
 Set-Variable DETAILS_EXCEPTION_DUPLICATE_SSHKEYPAIR_01 -Option Constant -Value "SSH Key pair policy '{0}' already exist"
 Set-Variable DETAILS_EXCEPTION_DUPLICATE_REQUESSCRIPT_01 -Option Constant -Value "RequestScript '{0}' already exist"
+Set-Variable DETAILS_EXCEPTION_DUPLICATE_VAULT_01 -Option Constant -Value "Vault '{0}' already exist"
+Set-Variable DETAILS_EXCEPTION_DUPLICATE_VAULTSECRET_01 -Option Constant -Value "VaultSecret '{0}' already exist"
 Set-Variable DETAILS_EXCEPTION_CANNOT_IMPORT_01 -Option Constant -Value "Cannot import extension type '{0}'"
 Set-Variable DETAILS_EXCEPTION_CANNOT_IMPORT_02 -Option Constant -Value "Import filename missing"
 Set-Variable DETAILS_EXCEPTION_TCF_01 -Option Constant -Value "PAM-CF-0001: The Custom Connector server is inaccessible or its configuration is invalid."

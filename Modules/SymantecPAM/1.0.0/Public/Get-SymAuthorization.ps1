@@ -39,21 +39,44 @@ function Get-SymAuthorization ()
     Param(
 		[Alias("AuthorizationID")]
         [Parameter(Mandatory=$false)][int] $ID= -1,
-        [Parameter(Mandatory=$false)][string] $ExecutionUser,
-        [Parameter(Mandatory=$false)][switch] $CheckExecutionUser= $false,
-		[Parameter(Mandatory=$false)][switch] $CheckExecutionPath= $false,
-		[Parameter(Mandatory=$false)][switch] $CheckFilePath= $false,
-		[Parameter(Mandatory=$false)][switch] $CheckScriptHash= $false,
-		[Parameter(Mandatory=$false)][int] $RequestServerID= -1,
-		[Parameter(Mandatory=$false)][int] $RequestScriptID= -1,
-		[Parameter(Mandatory=$false)][int] $TargetAliasID= -1,
-		[Parameter(Mandatory=$false)][int] $TargetGroupID= -1,
-		[Parameter(Mandatory=$false)][int] $RequestGroupID= -1,
 
-        [Parameter(Mandatory=$false)][switch] $useRegex= $false,
-        [Parameter(Mandatory=$false)][switch] $Single= $false,
-		[Parameter(Mandatory=$false)][switch] $Refresh= $false,
-        [Parameter(Mandatory=$false)][switch] $NoEmptySet= $false
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $TargetGroup,
+
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $TargetAlias,
+
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $RequestGroup,
+
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $RequestServer,
+
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string] $RequestScript,
+
+
+		[int[]] $RequestServerID= -1,
+		[int[]] $RequestScriptID= -1,
+		[int[]] $TargetAliasID= -1,
+		[int[]] $TargetGroupID= -1,
+		[int[]] $RequestGroupID= -1,
+
+        [string] $ExecutionUser,
+        [switch] $CheckExecutionUser= $false,
+		[switch] $CheckExecutionPath= $false,
+		[switch] $CheckFilePath= $false,
+		[switch] $CheckScriptHash= $false,
+
+        [switch] $useRegex= $false,
+        [switch] $Single= $false,
+		[switch] $Refresh= $false,
+        [switch] $NoEmptySet= $false
     )
     
 	process {
@@ -94,16 +117,22 @@ function Get-SymAuthorization ()
 			else {
 				$res= $script:cacheAuthorizationBase
 
+                if ($TargetGroup) {$TargetGroupID= (Get-SymGroup -Name $TargetGroup -GroupType TARGET -NoEmptySet).ID}
+                if ($RequestGroup) {$RequestGroupID= (Get-SymGroup -Name $RequestGroup -GroupType REQUESTOR -NoEmptySet).ID}
+                if ($TargetAlias) {$TargetAliasID= (Get-SymTargetAlias -Name $TargetAlias -NoEmptySet).ID}
+                if ($RequestScript) {$RequestScriptID= (Get-SymRequestScript -Name $RequestScript -NoEmptySet).ID}
+                if ($RequestServer) {$RequestServerID= (Get-SymRequestServer -Name $RequestServer -NoEmptySet).ID}
+
 				if ($CheckExecutionUser) {$res= $res | Where-Object {$_.CheckExecutionUser -eq "true"}}
 				if ($CheckExecutionPath) {$res= $res | Where-Object {$_.CheckExecutionPath -eq "true"}}
 				if ($CheckFilePath) {$res= $res | Where-Object {$_.CheckFilePath -eq "true"}}
 				if ($CheckScriptHash) {$res= $res | Where-Object {$_.CheckScriptHash -eq "true"}}
 
-				if ($RequestServerID -ge 0) {$res= $res | Where-Object {$_.RequestServerID -eq $RequestServerID}}
-				if ($RequestScriptID -ge 0) {$res= $res | Where-Object {$_.RequestScriptID -eq $RequestScriptID}}
-				if ($TargetAliasID -ge 0) {$res= $res | Where-Object {$_.TargetAliasID -eq $TargetAliasID}}
-				if ($TargetGroupID -ge 0) {$res= $res | Where-Object {$_.TargetGroupID -eq $TargetGroupID}}
-				if ($RequestGroupID -ge 0) {$res= $res | Where-Object {$_.RequestGroupID -eq $RequestGroupID}}
+				if ($RequestServerID -ge 0) {$res= $res | Where-Object {$_.RequestServerID -in $RequestServerID}}
+				if ($RequestScriptID -ge 0) {$res= $res | Where-Object {$_.RequestScriptID -in $RequestScriptID}}
+				if ($TargetAliasID -ge 0) {$res= $res | Where-Object {$_.TargetAliasID -in $TargetAliasID}}
+				if ($TargetGroupID -ge 0) {$res= $res | Where-Object {$_.TargetGroupID -in $TargetGroupID}}
+				if ($RequestGroupID -ge 0) {$res= $res | Where-Object {$_.RequestGroupID -in $RequestGroupID}}
 
 				if ($useRegex) {
 					if ($ExecutionUser) {$res= $res | Where-Object {$_.ExecutionUser -match $ExecutionUser}}

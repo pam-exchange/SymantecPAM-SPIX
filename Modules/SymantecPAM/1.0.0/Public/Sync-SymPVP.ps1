@@ -33,15 +33,18 @@ function Sync-SymPVP ()
 	process {
 		if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        if ($null -eq $params.name -or $params.name -eq "") {
-            throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $null ) )
-        }
-
         try {
-            # Get current object (update) or fail (new)
-            $current= Get-SymPVP -name $params.name -Single -NoEmptySet
+            if ($params.action -match 'update|remove') {
+                $current= Get-SymPVP -ID $params.ID -Single -NoEmptySet
+            }
 
             if ($params.action -eq 'new') {
+                if (!$params.name) {
+                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
+                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+                }
+                $current= Get-SymPVP -name $params.name -Single -NoEmptySet
+
                 $details= $DETAILS_EXCEPTION_DUPLICATE_PVP_01 -f $params.name
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
             }
@@ -56,7 +59,7 @@ function Sync-SymPVP ()
         if ($params.action -match '(update|remove)') { $newParams+= @{ 'PasswordViewPolicy.ID'= $current.ID } }
 
         if ($params.action -match '(new|update)') {
-            $newParams+= @{ "PasswordViewPolicy.name"= $params.name }
+            if ($params.name) {$newParams+= @{ "PasswordViewPolicy.name"= $params.name }}
             if ($params.description) {$newParams+= @{ "PasswordViewPolicy.description"= $params.description} }
 
             if ($params.approverIDs) { $newParams+= @{'PasswordViewPolicy.approverIDs'= $params.approverIDs} }

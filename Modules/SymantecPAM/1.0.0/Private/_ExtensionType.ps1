@@ -35,15 +35,7 @@ $extensionTypeBuiltIn= (
     'XsuiteApiKey'
 )
 
-$extensionTypeTCF= ( 
-    'keystorefile',
-    'configfile',
-    'mongodb',
-    'postgresql',
-    'pamuser'
-)
-
-$extensionType= $extensionTypeBuiltIn+$extensionTypeTCF
+$extensionType= $extensionTypeBuiltIn+$script:TCF
 
 function _ExtensionType () 
 {
@@ -56,5 +48,6 @@ function _ExtensionType ()
 
 function _isBuiltInExtensionType ($type) {
     $found= $extensionTypeBuiltIn | Where-Object {$_ -eq $type}
-    return [string]::IsNullOrWhiteSpace($found)
+    $found= -not [string]::IsNullOrWhiteSpace($found)
+    return $found
 }

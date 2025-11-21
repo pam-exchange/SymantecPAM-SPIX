@@ -24,8 +24,8 @@ SOFTWARE.
 #>
 #--------------------------------------------------------------------------------------
 
-$script:cachePARoleBase= New-Object System.Collections.ArrayList
-$script:cachePARoleByID= New-Object System.Collections.HashTable		# Index into cache array
+$script:cacheRoleBase= New-Object System.Collections.ArrayList
+$script:cacheRoleByID= New-Object System.Collections.HashTable		# Index into cache array
 
 enum DETAILS {
     COMPACT
@@ -52,10 +52,10 @@ function Get-SymRole ()
 		try {
             _ProtectedOperation -ResourceName "SymRole" -Operation {   
                 if ($Refresh) {
-                    $script:cachePARoleBase.Clear()
-                    $script:cachePARoleByID.Clear()
+                    $script:cacheRoleBase.Clear()
+                    $script:cacheRoleByID.Clear()
                 }
-                if (-not $script:cachePARoleBase) {
+                if (-not $script:cacheRoleBase) {
                     #
                     # Fetch the lot from PAM
                     #
@@ -69,8 +69,8 @@ function Get-SymRole ()
 
                         $obj.permissions= $obj.permissions.trim("[]")
 
-                        $idx= $script:cachePARoleBase.Add( $obj )
-                        $script:cachePARoleByID.Add( [int]($obj.ID), [int]($idx) )
+                        $idx= $script:cacheRoleBase.Add( $obj )
+                        $script:cacheRoleByID.Add( [int]($obj.ID), [int]($idx) )
                     }
                 }
             }
@@ -81,11 +81,11 @@ function Get-SymRole ()
 
             if ($ID -ge 0) {
 				# By ID
-				$idx= $Script:cachePARoleByID[ [int]$ID ]		# External ID to array idx
-				$res= $Script:cachePARoleBase[ [int]$idx ]
+				$idx= $Script:cacheRoleByID[ [int]$ID ]		# External ID to array idx
+				$res= $Script:cacheRoleBase[ [int]$idx ]
             }
 			else {
-				$res= $script:cachePARoleBase
+				$res= $script:cacheRoleBase
 
 				if ($useRegex) {
 					if ($Name) {$res= $res | Where-Object {$_.Name -match $Name}}
