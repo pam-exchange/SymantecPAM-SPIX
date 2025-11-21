@@ -220,7 +220,7 @@ Not all ObjectTypes and for TargetApplications and TargerAccounts the extensionT
 
 ### Limitations
 
-Import is available for ObjectTypes **Authorization**,**PCP**,**Proxy**,**PVP**,**RequestScript**,**RequestServer**,**Role**,**SSHKeyPairPolicy**,**TargetAccount**,**TargetApplication**,**TargetServer** and **UserGroup**.
+Import is available for ObjectTypes **Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer** and **UserGroup**.
 
 Other objectTypes may be available as exported CSV files, but they cannot be imported through SPIX.
 
@@ -230,11 +230,6 @@ Other objectTypes may be available as exported CSV files, but they cannot be imp
 Should processing a rows result in an error, the row is written to a new file and a column `ErrorMessage` with details is added. 
 Rows processed without errors will not appear in the new CSV file. A message is shown on the console with the exact filename for the new CSV file.
 
-| Error | Description |
-| :--- | _--- |
-| Invalid parameters | PAM-CM-0579: Error. Attempt to create a duplicate entry. - Duplicate alias |
-| Duplicate | Server '<hostname>' and application '<application Name>' already exist | 
-| Invalid parameters | PAM-CM-0813: Account username may not contain whitespace characters. |
 
 
 # SPIX Password
