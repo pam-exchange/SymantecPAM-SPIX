@@ -96,10 +96,6 @@ process {
 
         $Timestamp= $startTime.ToString('yyyyMMdd-HHmmss')
 
-        #$res= Get-SymAuthorization -RequestServer appserver*
-
-
-
         #
         # Prompt for passphrase when "-ShowPassword -Passphrase ''" is used
         #
@@ -124,7 +120,7 @@ process {
         }
 
         if ($Export) {
-            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $HostName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
+            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $SrvName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
         }
         elseif ($Import) {
             $res= Import-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Passphrase $Passphrase

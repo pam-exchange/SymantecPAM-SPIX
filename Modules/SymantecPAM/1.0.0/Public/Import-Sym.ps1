@@ -63,7 +63,7 @@ function Import-Sym (
                 'RequestServer'     { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'Role'              { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'SSHKeyPairPolicy'  { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
-                'TargetAccount'     { $failed= Import-SymTargetAccount -InputCsv $InputCsv -Passphrase $Passphrase; break }
+                'TargetAccount'     { $failed= Import-SymTargetAccount -InputCsv $InputCsv -UpdatePassword:$UpdatePassword -Passphrase $Passphrase; break }
                 'TargetApplication' { $failed= Import-SymTargetApplication -InputCsv $InputCsv; break }
                 'TargetServer'      { $failed= Import-SymGeneric -InputCsv $InputCsv; break }
                 'UserGroup'         { $failed= Import-SymUserGroup -InputCsv $InputCsv; break }

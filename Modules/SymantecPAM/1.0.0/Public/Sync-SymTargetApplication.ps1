@@ -35,32 +35,23 @@ function Sync-SymTargetApplication ()
 
         $srv= $null
         $current= $null
-        try {
-            if ($params.action -match 'update|remove') {
-                $current= Get-SymTargetApplication -ID $params.ID -Single -NoEmptySet
-            }
 
-            if ($params.action -eq 'new') {
-                if (!$Params.hostname) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-                if (!$params.name) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-
-                $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
-                $current= Get-SymTargetApplication -TargetServerID $srv.ID -Name $params.name -Single -NoEmptySet
-
-                $details= $DETAILS_EXCEPTION_DUPLICATE_APPL_01 -f $params.hostname, $params.name
-                throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
-            } 
-        } catch {
-            if ($_.Exception.Message -eq $EXCEPTION_DUPLICATE) {
-                throw
-            }
+        if ($params.action -match 'update|remove') {
+            $current= Get-SymTargetApplication -ID $params.ID -Single -NoEmptySet
         }
+
+        if ($params.action -eq 'new') {
+            if (!$Params.hostname) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+            }
+            $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
+
+            if (Get-SymTargetApplication -TargetServerID $srv.ID -Name $params.name) {
+                $details= $DETAILS_EXCEPTION_DUPLICATE_APPL_01 -f $srv.hostname, $params.name
+                throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
+            }
+        } 
             
         $newParams= @{}
 

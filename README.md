@@ -176,23 +176,23 @@ Done
 ## Import
 
 ```
-SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-Synchronize] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
+SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-UpdatePassword] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
 ```
 
 | Parameter | Description |
 | :---- | :---- |
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;InputFile&nbsp;\<filename> | Filename with import information. |
-| &#8209;Synchronize | Flag used when creating new accounts. PAM will try to synchronize the account when it is added. |  
-| &#8209;UpdatePassword | Flag used when creating new accounts.<br/>This flag is only relevant when creating a new account and the new account does **not** use an otherAccount for password update. PAM will synchronize the current password (provided) and change the password to a new random value. If the account uses an otherAccount, set the target account password for the new account to `_generate_pass_`. |  
+| &#8209;UpdatePassword | Flag used when creating a new TargetAccounts. If an account in hte input CAV has a password different from `_generate_pass_`, SPIX will attempt to generate a new password after the account has been added. |  
 | &#8209;Passphrase&nbsp;\<passphrase> | Used when updating existing accounts. The password in the import file is encrypted using the passphrase given. If the `passphrase` is empty "", the user is prompted to enter a passphrase. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
 | &#8209;Quiet | Less output when running SPIX |  
 
 ### Generate new random password
 
-When importing a file with ObjectType TargetAccount, it is possible to let PAM generate a new random password. This is relevant when using the actions **New** and **Update**. Set value in the `password` column to `_generate_pass_`. This will tell PAM to generate a new password according to the PCP defined for the target application.
+When importing a file with ObjectType TargetAccount, it is possible to let PAM generate a new random password. This is relevant when using the actions **New** and **Update**. Set the value in `password` column to `_generate_pass_`. This will tell PAM to generate a new password according to the PCP defined for the target application.
 
+If an account is added using a known password on the end-point, i.e. a password is specified, and the option `-UpdatePassword` is used, a password update to a new random value (**_generate_pass_**) is done. Typical use-case is to add an account where the password on the end-point and the account changes its own password.
 
 ### Import CSV
 
@@ -216,7 +216,6 @@ The row in the import CSV file is ignored.
 
 ![Export/Import CSV](/Docs/SPIX-Export.png)
 
-Not all ObjectTypes and for TargetApplications and TargerAccounts the extensionType can be created or updated using the SPIX import mechanism.
 
 ### Limitations
 
@@ -229,6 +228,7 @@ Other objectTypes may be available as exported CSV files, but they cannot be imp
 
 Should processing a rows result in an error, the row is written to a new file and a column `ErrorMessage` with details is added. 
 Rows processed without errors will not appear in the new CSV file. A message is shown on the console with the exact filename for the new CSV file.
+
 
 
 

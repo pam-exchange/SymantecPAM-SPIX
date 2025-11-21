@@ -33,18 +33,13 @@ function Sync-SymProxy ()
 	process {
         if ($params.action -notmatch '^(update|remove)$') {return $null}
 
+        if ($params.action -match 'update|remove') {
+            $current= Get-SymProxy -ID $params.ID -Single -NoEmptySet
+        }
+
         # 
         # Note: There is no 'New' option for Proxy servers
         #
-        try {
-            if (!$params.name) {
-                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
-                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-            }
-            $current= Get-SymProxy -Hostname $params.hostname -NoEmptySet
-        } catch {
-            throw
-        }
            
         $newParams= @{}
 

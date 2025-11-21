@@ -35,43 +35,36 @@ function Sync-SymTargetAccount ()
 
         $srv= $null
         $app= $null
-        try {
-            if ($params.action -match 'update|remove') {
-                $current= Get-SymTargetAccount -ID $params.ID -Single -NoEmptySet
+
+        if ($params.action -match 'update|remove') {
+            $current= Get-SymTargetAccount -ID $params.ID -Single -NoEmptySet
+        }
+
+        if ($params.action -eq 'new') {
+            if (!$Params.hostname) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
             }
+            $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
 
-            if ($params.action -eq 'new') {
-                if (!$Params.hostname) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'hostName'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-                if (!$params.TargetApplicationName) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'TargetApplicationName'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-                if (!$params.userName) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'userName'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
+            if (!$params.TargetApplicationName) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'TargetApplicationName'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+            }
+            $app= Get-SymTargetApplication -TargetServerID $srv.ID -Name $params.TargetApplicationName -Single -NoEmptySet
 
-                $srv= Get-SymTargetServer -Hostname $params.hostname -Single -NoEmptySet
-                $app= Get-SymTargetApplication -TargetServerID $srv.ID -Name $params.TargetApplicationName -Single -NoEmptySet
-                $current= Get-SymTargetAccount -TargetApplicationID $app.ID -userName $params.userName -Single -NoEmptySet
-
+            if (!$params.userName) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'userName'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
+            }
+            if (Get-SymTargetAccount -TargetApplicationID $app.ID -userName $params.userName) {
                 $details= $DETAILS_EXCEPTION_DUPLICATE_APPL_01 -f $params.hostname, $params.TargetApplicationName
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
-            }
-        } catch {
-            if ($_.Exception.Message -eq $EXCEPTION_DUPLICATE) {
-                throw
             }
         }
 
         if (!$app) {$app= Get-SymTargetApplication -ID $current.TargetApplicationID -NoEmptySet}
-        #$isBuiltInExtensionType= _isBuiltInExtensionType($app.type)
-
         if (!$srv) {$srv= Get-SymTargetServer -ID $app.TargetServerID -NoEmptySet}
-
 
 		#
 		# Build new parameters

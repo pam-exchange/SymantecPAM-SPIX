@@ -33,24 +33,18 @@ function Sync-SymRequestServer ()
 	process {
         if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        try {
-            if ($params.action -match 'update|remove') {
-                $current= Get-SymRequestServer -ID $params.ID -Single -NoEmptySet
+        if ($params.action -match 'update|remove') {
+            $current= Get-SymRequestServer -ID $params.ID -Single -NoEmptySet
+        }
+
+        if ($params.action -eq 'new') {
+            if (!$params.hostName) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'HostName'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
             }
-
-            if ($params.action -eq 'new') {
-                if (!$params.hostName) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'HostName'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-                $current= Get-SymRequestServer -Hostname $params.hostname -NoEmptySet
-
+            if (Get-SymRequestServer -Hostname $params.hostname) {
                 $details= $DETAILS_EXCEPTION_DUPLICATE_SERVER_01 -f $params.hostname
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
-            }
-        } catch {
-            if ($_.Exception.Message -eq $EXCEPTION_DUPLICATE) {
-                throw
             }
         }
             

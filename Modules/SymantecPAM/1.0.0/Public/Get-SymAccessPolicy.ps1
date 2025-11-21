@@ -105,13 +105,13 @@ function Get-SymAccessPolicy ()
             elseif ($res.GetType().Name -eq "PSCustomObject") {$cnt= 1} else {$cnt= $res.count}
 
             if ($NoEmptySet -and $cnt -eq 0) {
-                $details= $DETAILS_EXCEPTION_NOT_FOUND_01
+                $details= $DETAILS_EXCEPTION_NOT_FOUND_03 -f $($MyInvocation.MyCommand.Name), $Username, $DeviceName
                 throw ( New-Object SymantecPamException( $EXCEPTION_NOT_FOUND, $details ) )
             }
 
             if ($single -and $cnt -ne 1) {
                 # More than one managed system found with -single option 
-                $details= $DETAILS_EXCEPTION_NOT_SINGLE_01
+                $details= $DETAILS_EXCEPTION_NOT_SINGLE_02 -f $($MyInvocation.MyCommand.Name)
                 throw ( New-Object SymantecPamException( $EXCEPTION_NOT_SINGLE, $details ) )
             }
 

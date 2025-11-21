@@ -100,14 +100,13 @@ function Get-SymPCP ()
             elseif ($res.GetType().Name -eq "PSCustomObject") {$cnt= 1} else {$cnt= $res.count}
 
             if ($NoEmptySet -and $cnt -eq 0) {
-                if ($name) {$details= $DETAILS_EXCEPTION_NOT_FOUND_PCP_01 -f $name}
-                if ($id -ge 0) {$details= $DETAILS_EXCEPTION_NOT_FOUND_PCP_02 -f $ID}
+                $details= $DETAILS_EXCEPTION_NOT_FOUND_02 -f $($MyInvocation.MyCommand.Name),$Name
                 throw ( New-Object SymantecPamException( $EXCEPTION_NOT_FOUND, $details ) )
             }
 
             if ($single -and $cnt -ne 1) {
                 # More than one managed system found with -single option 
-                $details= $DETAILS_EXCEPTION_NOT_SINGLE_01
+                $details= $DETAILS_EXCEPTION_NOT_SINGLE_02 -f $($MyInvocation.MyCommand.Name)
                 throw ( New-Object SymantecPamException( $EXCEPTION_NOT_SINGLE, $details ) )
             }
 

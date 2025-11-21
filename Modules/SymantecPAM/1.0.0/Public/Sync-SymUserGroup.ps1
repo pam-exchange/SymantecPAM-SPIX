@@ -33,24 +33,18 @@ function Sync-SymUserGroup ()
 	process {
         if ($params.action -notmatch '^(new|update|remove)$') {return $null}
 
-        try {
-            if ($params.action -match 'update|remove') {
-                $current= Get-SymUserGroup -ID $params.ID -Single -NoEmptySet
+        if ($params.action -match 'update|remove') {
+            $current= Get-SymUserGroup -ID $params.ID -Single -NoEmptySet
+        }
+
+        if ($params.action -eq 'new') {
+            if (!$params.name) {
+                $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
+                throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
             }
-
-            if ($params.action -eq 'new') {
-                if (!$params.name) {
-                    $details= $DETAILS_EXCEPTION_INVALID_PARAMETER_01 -f 'Name'
-                    throw ( New-Object SymantecPamException( $EXCEPTION_INVALID_PARAMETER, $details ) )
-                }
-                $current= Get-SymUserGroup -name $params.name -Single -NoEmptySet
-
+            if (Get-SymUserGroup -name $params.name) {
                 $details= $DETAILS_EXCEPTION_DUPLICATE_USERGROUP_01 -f $params.name
                 throw ( New-Object SymantecPamException( $EXCEPTION_DUPLICATE, $details ) )
-            }
-        } catch {
-            if ($_.Exception.Message -eq $EXCEPTION_DUPLICATE) {
-                throw
             }
         }
             

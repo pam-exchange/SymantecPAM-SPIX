@@ -32,6 +32,7 @@ SOFTWARE.
 #--------------------------------------------------------------------------------------
 function Import-SymTargetAccount (
     [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv,
+    [switch] $UpdatePassword= $false,
     [string] $Passphrase= ""
 )
 {
@@ -59,7 +60,7 @@ function Import-SymTargetAccount (
                     # break <-- no break here
                 }
 
-                {'juniper','SPML2','sybase','unixII','vmware','weblogic10','windowsDomainService','windowsRemoteAgent','XsuiteApiKey' -eq $_} 
+                {'juniper','SPML2','sybase','vmware','weblogic10','windowsDomainService','windowsRemoteAgent','XsuiteApiKey' -eq $_} 
                 {
                     $params | Add-Member -NotePropertyName 'Attribute.extensionType' -NotePropertyValue $params.extensionType -Force
                     # break <-- no break here
@@ -111,11 +112,6 @@ function Import-SymTargetAccount (
                     if ($params.'Attribute.changeProcess') {$params.'Attribute.changeProcess'= $params.'Attribute.changeProcess'.ToUpper()}
                     break
                 }
-
-                'XsuiteApiKey' {
-                    # PAM 4.3 - ApiKey cannot be added as synchronized
-                    if ($params.synchronize) {$params.synchronize= 'false'}
-                }
                 } # end switch
 
                 # 
@@ -139,6 +135,16 @@ function Import-SymTargetAccount (
 
                 # Update/New/Remove from PAM
                 $res= Sync-SymTargetAccount -params $params
+
+                #
+                # Update Password
+                #
+                if ($updatePassword -and $row.action -eq 'new' -and $row.password -and $row.password -ne '_generate_pass_') {
+                    $params= $res
+                    $params | Add-Member -NotePropertyName 'Action' -NotePropertyValue 'update' -Force
+                    $params.password= '_generate_pass_'
+                    $res= Sync-SymTargetAccount -params $params
+                }
             }
             catch {
                 $row | Add-Member -NotePropertyName ErrorMessage -NotePropertyValue "$($_.Exception.Message) -- $($_.Exception.Details)" -Force
