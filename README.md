@@ -1,20 +1,18 @@
 # SymantecPAM SPIX
 
-Many years ago a tool named **xsie** was available for exporting from and importing information to Xceedium Xsuite PAM. Not everything, but specifically the Credential Management part of Xsuite. **xsie** was tested with Xsuite versioin 3.2 and there have been many updates and enhancements as it evolved to Symantec PAM. The tool in this repository is a newer version of **xsie** working with Symantec PAM version 4.3.
+Many years ago a tool named **xsie** was available for exporting information from and importing information to Xceedium Xsuite PAM. The name xsie was short for **Xs**uite **I**mport **E**xport. Not everything could be exported/imported, but specifically the Credential Management part of Xsuite and its successor CA PAM. **xsie** was tested with Xsuite/CA PAM until versioin 3.2. There have been many updates and enhancements with what now is Symantec PAM. The tools here is **S**ymantec **P**AM **I**mport **E**xport or short **SPIX** has a similar functionality as **xsie**, but is also covering enhancements added to Symantec PAM. 
 
-The tool SPIX has a similar functionality as the original xsie tool.
+Symantec PAM has built-in export/import functionality using CSV files for some information in PAM. However, this does not cover the  Credential Management information, and **SPIX** can be used export/import this using CSV files. **SPIX** is written in Powershell whereas **xsie** was written in Perl.
 
-Symantec PAM has export/import functionality using CSV files. However, this does not completely cover the Credential Management parts and **SPIX** can be used to extract information and save this to CSV files. **SPIX** can also be used to import information from CSV files. The tool is written in Powershell and is available free to use.
-
-When using **SPIX** it uses CLI and API calls to export and import information in Symantec PAM. **SPIX** will use the CLI/API users with the permissions they have in Symantec PAM, thus the permissions granted to the CLI/API users will determine if SPIX can retrieve ever7ything or if it has a limited functioinality in Symantec PAM. 
+**SPIX** uses CLI and API calls for exporting and importing information in Symantec PAM. **SPIX** will use a CLI/API users with the permissions they have in Symantec PAM, thus the permissions granted to the CLI/API users will determine how much information can be exported and if creating/updating/deleting is possible using **SPIX**. The tool does not allow actions in PAM which the CLI/API user does not have permissions to perform. 
 
 There are three Powershell scripts available. 
 
-- **SPIX-Config.ps1**  
-Script for generating a properties file with login credentials to CLI and API
-- **SPIX.ps1**  
-The import/export script
-- **SPIX-Password.ps1**  
+- **SPIX-Config**  
+Script for generating a properties file with login credentials to CLI and API.
+- **SPIX**  
+The import/export script including the module SymantecPAM.
+- **SPIX-Password**  
 When exporting passwords, these can be as plain text or encrypted using a passphrase. This tool is using the same encryption mechanism to decrypt and encrypt passwords. 
 
 
@@ -26,14 +24,17 @@ SPIX has been tested using the following environment
 - Powershell 5.1 and 7.5
 - Windows 11 and Windows Server 2022
 
+It has not been tested running Powershell on Linux. It is unknown if the mechanism for protecting CLI/API user passwords (see below) is working in a Linux environment.
 
 # Setup credentials properties
 
 **SPIX** uses the CLI and occationally the API when reading or updating credential management information. Both of these uses basic authentication (username/password) and these are stored in a properties file. **SPIX-Config** is used to create a properties file with basic configuration of the Symantec PAM encironment and the necessary CLI and API users and passwords. 
 
-Edit the file **SPIX-Config.ps1** such that it is matching you environment. The **tcf** variable is used to name any Custom Connectors available. Note that the names of Custom Connectors are case sensitive. Both the CLI and API users must exist in PAM. The CLI user is a regular user and the API user is an ApiKey. It is best assigned to the user and should have the same permissions as granted to the CLI user. 
+Edit the file **SPIX-Config.ps1** such that it is matching you environment. The **tcf** variable is used to name any Custom Connectors available. Note that the names of Custom Connectors are case sensitive. Both the CLI and API users must exist in PAM. The CLI user is a regular user and the API user is an ApiKey. It is best assigned to the user and should have the same permissions as granted to the CLI user.
  
 The delimiter is used to change how CSV files are created and read. Depending on the region and language settings of Windows a delimiter value can be specified. If the delimiter option is not specified the default value is `,`. 
+
+The limit is controlling how many entries can be returned when calling CLI/API. There is no paging mechanism available when reading information from PAM, thus if there is more information available, this is not visible to **SPIX**.
 
 ```
 $configSymantecPAM = @{
@@ -47,13 +48,15 @@ $configSymantecPAM = @{
 	apiPassword= "xxxxxxxxxxx";
 
 	tcf= ("keystorefile","configfile","mongodb","postgresql","pamuser");
+	limit= 100000;
 	delimiter= ";"
 }
 ```
 
-**SPIX-Config** will generate a properties file in `C:\Temp`. The passwords are encrypted using Powershell mechanism for encryption of passwords. Note that the encryption key used is fixed to a specific computer and user running the **SPIX-Config** script and will only work on the specific computer and for the specific user. A properties file for the specific computer and user must exist when using **SPIX**.
+**SPIX-Config** will generate a properties file in `C:\Temp`. The filename is will include the hostname and username. These information is used when Powershell encrypts the passwords in the properties file.<br/>
+**Note** that the encryption key used for protecting the passwords in the properties file is bound to a specific computer and the specific user running **SPIX-Config**. The properties file will only work on the same system and for the same user who generated the properties file. I.e. the properties file cannot be transfered to a different server or be used by a different user.
 
-By default **SPIX** will look for the properties file in the current directory. The location of a properties file can be changed with a command line parameter.
+**SPIX** will look for the properties file in the current directory. The location of a properties file can be changed with a command line parameter.
 
 # Running SPIX
 
