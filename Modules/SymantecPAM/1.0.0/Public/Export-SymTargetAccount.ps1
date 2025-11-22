@@ -32,6 +32,7 @@ function Export-SymTargetAccount (
     [string] $OutputPath= ".\SPIX-output",
     [switch] $ShowPassword= $false,
     [string] $Passphrase= "",
+    [switch] $Compress= $false,
     [string] $Delimiter= ",",
     [switch] $Quiet= $false
 )
@@ -41,6 +42,13 @@ function Export-SymTargetAccount (
         if (!$List) {return}
 
         if (!$Timestamp) {$timestamp= (Get-Date).ToString("yyyyMMdd-HHmmss")}
+
+        if ($compress) {
+            $outFilename= "$OutputPath\TargetAccount-$Timestamp.csv"
+            $columnOrder = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','targetApplicationName','username')
+            $List | Select-Object $columnOrder | Sort-Object -Property ID | Export-Csv -Path $outFilename -NoTypeInformation -Delimiter $Delimiter
+            return
+        }
 
         $extension= ($List | Select-Object -property extensionType -Unique).extensionType | Sort-Object
         foreach ($ext in $extension) {

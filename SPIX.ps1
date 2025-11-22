@@ -40,6 +40,7 @@ param (
     [Parameter(ParameterSetName='Export')][string] $AppName= '',
     [Parameter(ParameterSetName='Export')][string] $AccName= '',
     [Parameter(ParameterSetName='Export')][string] $ExtensionType= '',
+    [Parameter(ParameterSetName='Export')][switch] $Compress= $false,
 
     [Parameter(Mandatory=$true,ParameterSetName='Import')][switch] $Import= $false,
     [Parameter(Mandatory=$true,ParameterSetName='Import')][string] $InputFile,
@@ -120,7 +121,7 @@ process {
         }
 
         if ($Export) {
-            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $SrvName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
+            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $SrvName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -Compress:$Compress -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
         }
         elseif ($Import) {
             $res= Import-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Passphrase $Passphrase

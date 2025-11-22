@@ -30,14 +30,15 @@ SOFTWARE.
 
 #--------------------------------------------------------------------------------------
 function Export-SymTargetApplication (
-    [Parameter(Mandatory=$false)][AllowEmptyString()][PSCustomObject[]] $List= $null,
-    [Parameter(Mandatory=$false)][string] $Timestamp,
-    [Parameter(Mandatory=$false)][string[]] $fixedColumns= $TargetApplication_fixedColumns,
-    [Parameter(Mandatory=$false)][string[]] $ignoreColums= $TargetApplication_ignoreColums,
-    [Parameter(Mandatory=$false)][string] $OutputPath= ".\SPIX-output",
-    [Parameter(Mandatory=$false)][string] $Delimiter= ",",
+    [AllowEmptyString()][PSCustomObject[]] $List= $null,
+    [string] $Timestamp,
+    [string[]] $fixedColumns= $TargetApplication_fixedColumns,
+    [string[]] $ignoreColums= $TargetApplication_ignoreColums,
+    [string] $OutputPath= ".\SPIX-output",
+    [switch] $Compress= $false,
+    [string] $Delimiter= ",",
 
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false
+    [switch] $Quiet= $false
 )
 {
 	process {
@@ -46,6 +47,13 @@ function Export-SymTargetApplication (
         }
 
         if (!$Timestamp) {$timestamp= (Get-Date).ToString("yyyyMMdd-HHmmss")}
+
+        if ($compress) {
+            $outFilename= "$OutputPath\TargetApplication-$Timestamp.csv"
+            $columnOrder = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','name')
+            $List | Select-Object $columnOrder | Sort-Object -Property ID | Export-Csv -Path $outFilename -NoTypeInformation -Delimiter $Delimiter
+            return
+        }
 
         $extension= ($List | Select-Object -property extensionType -Unique).extensionType | Sort-Object
         foreach ($ext in $extension) {

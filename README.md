@@ -68,7 +68,7 @@ Will show a brief description of parameters.
 ## Export
 
 ```
-SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-SrvName <filter>] [-AppName <filter>] [-AccName <filter>] [-ExtensionType <name>] [-ShowPassword] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
+SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-SrvName <filter>] [-AppName <filter>] [-AccName <filter>] [-ExtensionType <name>] [-ShowPassword] [-Passphrase <passphrase>] [-Compress] [-Delimiter <character>] [-Quiet]
 ```
 
 
@@ -84,6 +84,7 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 | &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is fetched.|  
 | &#8209;Passphrase&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `passphrase` is empty "", the user is prompted to enter a passphrase.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file. |  
+| &#8209;Compress | Used when exporting TargetApplication and TargetAccounts. Instead of creating individual CSV files for each extensionType, just create a single file without all attributes for TargetApplications and TargetAccounts. The file with TargetAccount will not include passwords. |  
 | &#8209;Quiet | Less output when running SPIX |  
 
 
@@ -183,8 +184,8 @@ SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-UpdatePassword] [-Pa
 | :---- | :---- |
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;InputFile&nbsp;\<filename> | Filename with import information. |
-| &#8209;UpdatePassword | Flag used when creating a new TargetAccounts. If an account in hte input CAV has a password different from `_generate_pass_`, SPIX will attempt to generate a new password after the account has been added. |  
-| &#8209;Passphrase&nbsp;\<passphrase> | Used when updating existing accounts. The password in the import file is encrypted using the passphrase given. If the `passphrase` is empty "", the user is prompted to enter a passphrase. |  
+| &#8209;UpdatePassword | Flag used when creating a new TargetAccounts. If an account in the input CSV has a password different from `_generate_pass_`, SPIX will attempt to generate a new password after the account has been added. |  
+| &#8209;Passphrase&nbsp;\<passphrase> | When a password in the import CSV file is encrypted, it is decrypted using the passphrase before being created or updated. If the `passphrase` is empty "", the user is prompted to enter a passphrase. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
 | &#8209;Quiet | Less output when running SPIX |  
 

@@ -57,25 +57,21 @@ enum EXPORTCATEGORY {
 function Export-Sym (
 
 	[Alias('TargetServerName','Hostname')]
-    [Parameter(Mandatory=$false)]
     [AllowEmptyString()]
     [string] 
     $srvName,
 
 	[Alias('TargetApplicationName')]
-    [Parameter(Mandatory=$false)]
     [AllowEmptyString()]
     [string] 
     $appName,
 
 	[Alias('TargetAccountName','username')]
-    [Parameter(Mandatory=$false)]
     [AllowEmptyString()]
     [string] 
     $accName,
 
     [Alias('Type')]
-    [Parameter(Mandatory=$false)]
     [AllowEmptyString()]
     [string] 
     $extensionType,
@@ -83,13 +79,14 @@ function Export-Sym (
     [switch] $showPassword= $false,
     [AllowEmptyString()][string] $Passphrase= "",
 
-    [Parameter(Mandatory=$false)][string] $Timestamp,
-    [Parameter(Mandatory=$false)][EXPORTCATEGORY[]] $Category= 'ALL',
-    [Parameter(Mandatory=$false)][string] $OutputPath= '.\SPIX-output',
+    [string] $Timestamp,
+    [EXPORTCATEGORY[]] $Category= 'ALL',
+    [string] $OutputPath= '.\SPIX-output',
 
+    [switch] $Compress= $false,
     [AllowEmptyString()][string] $Delimiter,
 
-    [Parameter(Mandatory=$false)][switch] $Quiet= $false
+    [switch] $Quiet= $false
 )
 {
     process {
@@ -120,7 +117,7 @@ function Export-Sym (
                 $targetApplication = Get-SymTargetApplication -srvName $srvName -appName $appName -ExtensionType $ExtensionType
                 $fixedColumns = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','name','PCP','Attribute.descriptor1','Attribute.descriptor2')
                 $ignoreColums = @('deviceId','policyID','TargetServerID','overrideDnsType','Attribute.agentId','Attribute.sshKeyPairPolicyID','Attribute.customWorkflowId')
-                Export-SymTargetApplication -List $targetApplication -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -Quiet:$Quiet
+                Export-SymTargetApplication -List $targetApplication -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Compress:$Compress -Delimiter $Delimiter -OutputPath $OutputPath -Quiet:$Quiet
             }
 
             {'ALL', 'Target','TargetAccount' -eq $_}
@@ -129,7 +126,7 @@ function Export-Sym (
                 $targetAccount = Get-SymTargetAccount -srvName $srvName -appName $appName -accName $accName -ExtensionType $ExtensionType
                 $fixedColumns = @('ID','ObjectType','Action','ExtensionType','deviceName','hostname','targetApplicationName','username','password')
                 $ignoreColums = @('cacheAllowed','cacheBehaviorInt','compoundAccount','compoundServerIDs','ownerUserID','passwordViewPolicyID','parentAccountId','Privileged','ServerkeyID','TargetApplication','TargetApplicationID','TargetServerAlias','TargetServerID','Attribute.useOtherAccountToChangePassword')
-                Export-SymTargetAccount -List $targetAccount -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Delimiter $Delimiter -OutputPath $OutputPath -ShowPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
+                Export-SymTargetAccount -List $targetAccount -fixedColumns $fixedColumns -ignoreColums $ignoreColums -Timestamp $Timestamp -Compress:$Compress -Delimiter $Delimiter -OutputPath $OutputPath -ShowPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
             }
 
             {'ALL', 'A2A','RequestServer' -eq $_}
