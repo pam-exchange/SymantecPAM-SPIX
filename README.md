@@ -72,7 +72,7 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 ```
 
 
-| Parameter | Description |
+| Option | Description |
 | :---- | :---- |
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;OutputPath&nbsp;\<path> | Path where exported files are stored. Default is `.\SPIX-output`, which will be created if it does not exist. |
@@ -177,15 +177,15 @@ Done
 ## Import
 
 ```
-SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-UpdatePassword] [-Passphrase <passphrase>] [-Delimiter <character>] [-Quiet]
+SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-Passphrase <passphrase>] [-UpdatePassword] [-Delimiter <character>] [-Quiet]
 ```
 
-| Parameter | Description |
+| Option | Description |
 | :---- | :---- |
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;InputFile&nbsp;\<filename> | Filename with import information. |
-| &#8209;UpdatePassword | Flag used when creating a new TargetAccounts. If an account in the input CSV has a password different from `_generate_pass_`, SPIX will attempt to generate a new password after the account has been added. |  
 | &#8209;Passphrase&nbsp;\<passphrase> | When a password in the import CSV file is encrypted, it is decrypted using the passphrase before being created or updated. If the `passphrase` is empty "", the user is prompted to enter a passphrase. |  
+| &#8209;UpdatePassword | Flag used when creating a new TargetAccounts. If an account in the input CSV has a password different from `_generate_pass_`, SPIX will attempt to generate a new password after the account has been added. |  
 | &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file |  
 | &#8209;Quiet | Less output when running SPIX |  
 
@@ -193,7 +193,7 @@ SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-UpdatePassword] [-Pa
 
 When importing a file with ObjectType TargetAccount, it is possible to let PAM generate a new random password. This is relevant when using the actions **New** and **Update**. Set the value in `password` column to `_generate_pass_`. This will tell PAM to generate a new password according to the PCP defined for the target application.
 
-If an account is added using a known password on the end-point, i.e. a password is specified, and the option `-UpdatePassword` is used, a password update to a new random value (**_generate_pass_**) is done. Typical use-case is to add an account where the password on the end-point and the account changes its own password.
+The option `-UpdatePassword` is used when creating a new TargetAccount when a known password is used at the end-point. After the account added a password update to a new random value using (**_generate_pass_**) is done. Typical use-case is when adding an account in PAM where the password on the end-point is known and the account changes its own password, i.e. there is no otherAccount specified. If there is an otherAccount specified, it is recommended using the account password `_generate_pass_`.
 
 ### Import CSV
 

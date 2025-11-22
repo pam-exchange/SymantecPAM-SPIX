@@ -26,7 +26,8 @@ SOFTWARE.
 
 
 function Import-SymGeneric (
-    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv
+    [PSCustomObject[]] $InputCsv,
+    [switch] $Quiet= $false
 )
 {
 	process {
@@ -36,7 +37,7 @@ function Import-SymGeneric (
                 if ($row.Action -notmatch "^(New|Update|Remove)$") {
                     continue
                 }
-
+                
                 switch ($row.ObjectType) {
                     'Authorization' { $res= Sync-SymAuthorization -params $row; break }
                     'RequestServer' { $res= Sync-SymRequestServer -params $row; break }

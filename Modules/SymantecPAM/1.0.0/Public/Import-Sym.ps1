@@ -30,7 +30,8 @@ function Import-Sym (
     [string] $Timestamp,
     [switch] $Synchronize= $false,
     [switch] $UpdatePassword= $false,
-    [string] $Passphrase
+    [string] $Passphrase,
+    [switch] $Quiet= $false
 )
 {
 	process {

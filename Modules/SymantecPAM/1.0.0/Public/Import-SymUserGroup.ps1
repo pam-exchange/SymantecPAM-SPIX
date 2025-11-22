@@ -26,7 +26,8 @@ SOFTWARE.
 
 
 function Import-SymUserGroup (
-    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv
+    [PSCustomObject[]] $InputCsv,
+    [switch] $Quiet= $false
 )
 {
 	process {

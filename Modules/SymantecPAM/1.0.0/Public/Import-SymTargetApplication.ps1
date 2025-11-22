@@ -40,7 +40,8 @@ enum DONOTIMPORT {
 
 #--------------------------------------------------------------------------------------
 function Import-SymTargetApplication (
-    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject] $InputCsv
+    [PSCustomObject] $InputCsv,
+    [switch] $Quiet= $false
 )
 {
 	process {

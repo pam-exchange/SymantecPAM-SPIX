@@ -31,9 +31,10 @@ SOFTWARE.
 
 #--------------------------------------------------------------------------------------
 function Import-SymTargetAccount (
-    [Parameter(Mandatory=$false,ParameterSetName="CSV")][PSCustomObject[]] $InputCsv,
+    [PSCustomObject[]] $InputCsv,
     [switch] $UpdatePassword= $false,
-    [string] $Passphrase= ""
+    [string] $Passphrase= "",
+    [switch] $Quiet= $false
 )
 {
 	process {
@@ -43,6 +44,7 @@ function Import-SymTargetAccount (
                 if ($row.Action -notmatch "^(Update|New|Remove)$") {
                     continue
                 }
+
                 $params= $row | Select-Object * -ExcludeProperty cacheAllow,ObjectType,deviceName,PasswordVerified,'Attribute.isProvisionedAccount'
 
                 switch($params.extensionType) {
