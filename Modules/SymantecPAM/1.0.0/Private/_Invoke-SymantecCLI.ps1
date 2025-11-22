@@ -92,7 +92,6 @@ function _Invoke-SymantecCLI () {
 
     }
     catch {
-        #Write-Host $_.Exception
         # Invalid Hostname: $_.Exception.Message -eq "Unable to connect to the remote server"
         # URL valid: The remote server returned an error: (404) Not Found.
 

@@ -1,20 +1,20 @@
 # SymantecPAM SPIX
 
-Many years ago a tool named **xsie** used for exporting and importing information to the Credential Management part of Xceedium (now Symantec PAM) was available as a Perl script. 
+Many years ago a tool named **xsie** was available for exporting from and importing information to Xceedium Xsuite PAM. Not everything, but specifically the Credential Management part of Xsuite. **xsie** was tested with Xsuite versioin 3.2 and there have been many updates and enhancements as it evolved to Symantec PAM. The tool in this repository is a newer version of **xsie** working with Symantec PAM version 4.3.
 
 The tool SPIX has a similar functionality as the original xsie tool.
 
-Main purpose is to allow export of SymantecPAM credentials management information into CSV files, using names instead of internal IDs returned from the CLI commands. For example when refering to a master account for password change, the CLI returns an ID of the account. SPIX will convert the internal ID to names and use these in the CSV file. Also included in SPIX is an import functionality, where a CSV file can be used to bulk import new entries or to update existing entries. 
+Symantec PAM has export/import functionality using CSV files. However, this does not completely cover the Credential Management parts and **SPIX** can be used to extract information and save this to CSV files. **SPIX** can also be used to import information from CSV files. The tool is written in Powershell and is available free to use.
 
-SPIX uses the CLI and API for finding and updating information in the credential management part of Symantec PAM. It uses a login user for CLI commands and an API key for API calls. 
+When using **SPIX** it uses CLI and API calls to export and import information in Symantec PAM. **SPIX** will use the CLI/API users with the permissions they have in Symantec PAM, thus the permissions granted to the CLI/API users will determine if SPIX can retrieve ever7ything or if it has a limited functioinality in Symantec PAM. 
 
 There are three Powershell scripts available. 
 
-- SPIX-Config.ps1  
+- **SPIX-Config.ps1**  
 Script for generating a properties file with login credentials to CLI and API
-- SPIX.ps1  
+- **SPIX.ps1**  
 The import/export script
-- SPIX-Password.ps1  
+- **SPIX-Password.ps1**  
 When exporting passwords, these can be as plain text or encrypted using a passphrase. This tool is using the same encryption mechanism to decrypt and encrypt passwords. 
 
 
@@ -29,10 +29,11 @@ SPIX has been tested using the following environment
 
 # Setup credentials properties
 
-The SPIX tool is using the CLI and occationally the API when reading or updating credential management information. Both of these uses basic authentication (username/password) and these are stored in a properties file. The script SPIX-Config is used to create such a properties file with basic configuration of the Symantec PAM encironment, the necessary CLI and API users and passwords. 
+**SPIX** uses the CLI and occationally the API when reading or updating credential management information. Both of these uses basic authentication (username/password) and these are stored in a properties file. **SPIX-Config** is used to create a properties file with basic configuration of the Symantec PAM encironment and the necessary CLI and API users and passwords. 
 
-Edit the file SPIX-Config.ps1 such that it is matching you environment. The `tcf` variable is used to name any Custom Connectors available. The CLI user must exist as a login user in PAM and the API key is assigned to the user. The ID suffix of the API key is assigned when the user is created. 
-Default CSV file delimiter is ',' and should be set to match the region/language setting for Excel or whatever program is used to view CSV files.
+Edit the file **SPIX-Config.ps1** such that it is matching you environment. The **tcf** variable is used to name any Custom Connectors available. Note that the names of Custom Connectors are case sensitive. Both the CLI and API users must exist in PAM. The CLI user is a regular user and the API user is an ApiKey. It is best assigned to the user and should have the same permissions as granted to the CLI user. 
+ 
+The delimiter is used to change how CSV files are created and read. Depending on the region and language settings of Windows a delimiter value can be specified. If the delimiter option is not specified the default value is `,`. 
 
 ```
 $configSymantecPAM = @{
@@ -50,9 +51,9 @@ $configSymantecPAM = @{
 }
 ```
 
-SPIX-Config.ps1 will generate a properties file in `C:\Temp` where the passwords are encrypted using Powershell mechanism for encryption of passwords. The encryption is fixed to a specific computer and user running the SPIX-Config script and subsequently the SPIX script. 
+**SPIX-Config** will generate a properties file in `C:\Temp`. The passwords are encrypted using Powershell mechanism for encryption of passwords. Note that the encryption key used is fixed to a specific computer and user running the **SPIX-Config** script and will only work on the specific computer and for the specific user. A properties file for the specific computer and user must exist when using **SPIX**.
 
-By default the SPIX.ps1 script will look for the file in the current directory, but it can be changed using a command line parameter.
+By default **SPIX** will look for the properties file in the current directory. The location of a properties file can be changed with a command line parameter.
 
 # Running SPIX
 
@@ -67,9 +68,7 @@ Will show a brief description of parameters.
 
 ## Export
 
-```
-SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-SrvName <filter>] [-AppName <filter>] [-AccName <filter>] [-ExtensionType <name>] [-ShowPassword] [-Passphrase <passphrase>] [-Compress] [-Delimiter <character>] [-Quiet]
-```
+SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Passphrase \<passphrase>] [-Compress] [-Delimiter \<character>] [-Quiet]
 
 
 | Option | Description |
@@ -77,23 +76,22 @@ SPIX -Export [-ConfigPath <path>] [-OutputPath <path>] [-Category <category>] [-
 | &#8209;ConfigPath&nbsp;\<path> | Path where configuration properties file is located. Default is current directory `.\` |
 | &#8209;OutputPath&nbsp;\<path> | Path where exported files are stored. Default is `.\SPIX-output`, which will be created if it does not exist. |
 | &#8209;Category&nbsp;\<category> | One or more categories to export. Available options are<br/>**ALL**<br/>**Target** (TargetServer, TargetApplication, TargetAccount)<br/>**A2A** (RequestServer, RequestScript, Authorization)<br/>**Proxy**<br/>**Policy** (PCP, PVP, SSHKeyPairPolicy, JIT or CustomWorkflow)<br/>**UserGroup** (Filter, Group, Role, User, UserGroup)<br/>**Secret** (Vault, VaultSecret)<br/>**AccessPolicy**<br/>**Service**<br/>**Device** |
-| &#8209;SrvName&nbsp;\<filter> | Used with Category `Target`, `TargetServer`, `TargetApplication` and `TargetAccount`.<br/>Specify a hostname for the target server. Wildcard `*` can be used. |  
-| &#8209;AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name for the target application. Wildcard `*` can be used. |  
-| &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) for the target account. Wildcard `*` can be used. |  
-| &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account to export. Wildcard `*` can be used. |  
-| &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve target account password and store it in clear text in the export file. If the PVP uses options to checkout, appovals or e.mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is fetched.|  
-| &#8209;Passphrase&nbsp;\<passphrase> | Used together with `-ShowPassword`. If the `passphrase` is empty "", the user is prompted to enter a passphrase.<br/>Passwords are fetched and encrypted using an encryption key derived from the passphrase. |  
-| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV file. This option will overrule the settings in the properties file. |  
-| &#8209;Compress | Used when exporting TargetApplication and TargetAccounts. Instead of creating individual CSV files for each extensionType, just create a single file without all attributes for TargetApplications and TargetAccounts. The file with TargetAccount will not include passwords. |  
+| &#8209;SrvName&nbsp;\<filter> | Used with Category `Target`, `TargetServer`, `TargetApplication` and `TargetAccount`.<br/>Specify a hostname as filter for target servers. Wildcard `*` can be used. |  
+| &#8209;AppName&nbsp;\<filter> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an application name as filter for target applications. Wildcard `*` can be used. |  
+| &#8209;AccName&nbsp;\<filter> | Used with Category `Target` and `TargetAccount`.<br/>Specify an account name (username) as filter for target accounts. Wildcard `*` can be used. |  
+| &#8209;ExtensionType&nbsp;\<ext> | Used with Category `Target`, `TargetApplication` and `TargetAccount`.<br/>Specify an extension for application and account types to export. Wildcard `*` can be used. |  
+| &#8209;ShowPassword | Used with Category `Target` and `TargetAccount`. Retrieve password for target accounts and export it in clear text in the CSV file. If the Password View Policy (PVP) used for the target account uses options for checkout, appovals or e-mail notifications, the PVP is temporarely changed to 'SPIX-PVP' before the password is retrieved from PAM. If the PVP does not exist it is created. |  
+| &#8209;Passphrase&nbsp;\<passphrase> | Used together with the option `-ShowPassword`. If the `passphrase` is empty (''), the user is prompted to enter a passphrase.<br/>Passwords fetched are encrypted using an encryption key derived from the passphrase. |  
+| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV files. This option will overrule the settings in the properties file. |  
+| &#8209;Compress | Used when exporting TargetApplication and TargetAccounts. Instead of creating CSV files for each extensionType, this option will create a single file without attributes specific for extensionTypes for TargetApplications and TargetAccounts. Such a file does not will not include passwords for TargetAccounts. |  
 | &#8209;Quiet | Less output when running SPIX |  
 
-
-When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after SPIX has completed its export of target account passwords. It can be deleted manually and will be created next time SPIX is exporting target account passwords.
+When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after **SPIX** has completed exporting of target account passwords. It can be deleted manually and will, if needed, be created next time **SPIX** is used for exporting target accounts and associated password.
 
 Available values for **extensionType** are the built-in connectors:  
 activeDirectorySshKey, AS400, AwsAccessCredentials, AwsApiProxyCredentials, AzureAccessCredentials, CiscoSSH, Generic, genericSecretType, HPServiceManager, juniper, ldap, mssql, mssqlAzureMI, nsxcontroller, nsxmanager, nsxproxy, oracle, PaloAlto, RadiusTacacsSecret, remedy, ServiceDeskBroker, ServiceNow, SPML2, sybase, unixII, vcf, vmware, weblogic10, windows, windowsDomainService, windowsRemoteAgent, windowsSshKey, windowsSshPassword, XsuiteApiKey
 
-**plus** names for all Custom Connectors specified in the properties file.
+**plus** names for all Custom Connectors specified in the properties `tcf` option. Keep in mind that the names are case sensitive.
 
 
 ### Examples
@@ -176,9 +174,7 @@ Done
 
 ## Import
 
-```
-SPIX -Import [-ConfigPath <path>] [-InputFile <filename>] [-Passphrase <passphrase>] [-UpdatePassword] [-Delimiter <character>] [-Quiet]
-```
+SPIX **-Import** [-ConfigPath \<path>] [-InputFile \<filename>] [-Passphrase \<passphrase>] [-UpdatePassword] [-Delimiter \<character>] [-Quiet]
 
 | Option | Description |
 | :---- | :---- |
@@ -222,20 +218,17 @@ The row in the import CSV file is ignored.
 
 Import is available for ObjectTypes **Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer** and **UserGroup**.
 
-Other objectTypes may be available as exported CSV files, but they cannot be imported through SPIX.
+Other objectTypes may be exported CSV files, but they cannot be imported through **SPIX**.
 
 
 ### Errors during import
 
-Should processing a rows result in an error, the row is written to a new file and a column `ErrorMessage` with details is added. 
-Rows processed without errors will not appear in the new CSV file. A message is shown on the console with the exact filename for the new CSV file.
-
-
+Should processing a rows result in an error, the row is written to a new file and a column `ErrorMessage` with details is added on a new CSV file. Rows in a CSV file processed without errors will not appear in the new CSV file generated. A message with the filename of the generated CSV file is shown on the console.
 
 
 # SPIX Password
 
-There is a utility named `SPIX-Passwpord` available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. The encrypted password is prefixed with `{enc}`.
+The utility `SPIX-Passwpord` is available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. Encrypted password is prefixed with `{enc}`.
 
 If the **-Passphrase** option is not provided, the user is prompted for the passphrase.
 
@@ -272,5 +265,5 @@ HelloWorld
 
 ```
 
-Note that using the same passphrase and same password will give different encrypted passwords.
+Note that even when using the same password and same passphrase will give different encrypted passwords.
 

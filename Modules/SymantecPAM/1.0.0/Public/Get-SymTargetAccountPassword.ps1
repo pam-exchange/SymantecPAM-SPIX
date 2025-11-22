@@ -34,85 +34,67 @@ function Get-SymTargetAccountPassword ()
     
 	process {
 
-		try {
+		#
+		# Change PVP if checkout, email notifictions, etc.
+		#
+		if ($Unattended) {
+			$acc= Get-SymTargetAccount -ID $AccountID
+			$pvpOrg= Get-SymPVP -ID $acc.passwordViewPolicyID
 
-            #if ($AccountID -eq "342001") {
-            #    write-host "break"
-            #}
+			if ($pvpOrg.changePasswordOnView -eq 'true' -or 
+				$pvpOrg.reasonRequiredView -eq 'true' -or 
+				$pvpOrg.retrospectiveApprovalRequired -eq 'true' -or 
+				$pvpOrg.emailNotificationRequired -eq 'true' -or 
+				$pvpOrg.exclusiveCheckoutRequired -eq 'true' -or
+				$pvpOrg.authenticationRequiredView -eq 'true')
+			{
+				try {
+					$pvpNew= Get-SymPVP -Name "SPIX-PVP" -Single -NoEmptySet
+				}
+				catch {
+					$params= @{
+						action= 'New'
+						name= 'SPIX-PVP'
+						description= 'PVP used by SPIX'
+					}
+					$pvpNew= Sync-SymPVP -params $params
+				}
 
-            #
-            # Change PVP if checkout, email notifictions, etc.
-            #
-            if ($Unattended) {
-                $acc= Get-SymTargetAccount -ID $AccountID
-                $pvpOrg= Get-SymPVP -ID $acc.passwordViewPolicyID
-
-                if ($pvpOrg.changePasswordOnView -eq 'true' -or 
-                    $pvpOrg.reasonRequiredView -eq 'true' -or 
-                    $pvpOrg.retrospectiveApprovalRequired -eq 'true' -or 
-                    $pvpOrg.emailNotificationRequired -eq 'true' -or 
-                    $pvpOrg.exclusiveCheckoutRequired -eq 'true' -or
-                    $pvpOrg.authenticationRequiredView -eq 'true')
-                {
-                    try {
-                        $pvpNew= Get-SymPVP -Name "SPIX-PVP" -Single -NoEmptySet
-                    }
-                    catch {
-                        $params= @{
-                            action= 'New'
-                            name= 'SPIX-PVP'
-                            description= 'PVP used by SPIX'
-                        }
-                        $pvpNew= Sync-SymPVP -params $params
-                    }
-
-                    $update= $acc
-                    $update.passwordViewPolicyID= $pvpNew.id
-                    $update.password= $null
-                    $upd= Update-SymTargetAccount -params $update
-                }
-                else {
-                    $pvpNew= $null
-                }
-            }
-
-            #
-            # Fetch password
-            #
-            $params = @{
-                'TargetAccount.ID' = $AccountID
-                reason = "Other"
-                reasonDetails = $Reason
-                referenceCode= $Reason
-                }
-            #Write-Host "Account ID= $AccountID"
-            $res= _Invoke-SymantecCLI -Cmd "viewAccountPassword" -Params $params
-            $passwd= $res.'cr.result'.TargetAccount.password
-
-            #
-            # Restore PVP
-            #
-            if ($Unattended) {
-                if ($pvpNew) {
-                    $update= $acc
-                    $update.password= $null
-                    $update.passwordViewPolicyID= $pvpOrg.id
-                    <#@{
-                        ID= $acc.ID
-                        userName= $acc.userName
-                        passwordViedwPolicyID= $pvpOrg.id
-                    }
-                    #>
-                    $upd= Update-SymTargetAccount -params $update
-                }
-            }
-
-            return $passwd
+				$update= $acc
+				$update.passwordViewPolicyID= $pvpNew.id
+				$update.password= $null
+				$upd= Update-SymTargetAccount -params $update
+			}
+			else {
+				$pvpNew= $null
+			}
 		}
-        catch
-        {
-            throw
-        }
+
+		#
+		# Fetch password
+		#
+		$params = @{
+			'TargetAccount.ID' = $AccountID
+			reason = "Other"
+			reasonDetails = $Reason
+			referenceCode= $Reason
+			}
+		$res= _Invoke-SymantecCLI -Cmd "viewAccountPassword" -Params $params
+		$passwd= $res.'cr.result'.TargetAccount.password
+
+		#
+		# Restore PVP
+		#
+		if ($Unattended) {
+			if ($pvpNew) {
+				$update= $acc
+				$update.password= $null
+				$update.passwordViewPolicyID= $pvpOrg.id
+				$upd= Update-SymTargetAccount -params $update
+			}
+		}
+
+		return $passwd
     }
 }
 

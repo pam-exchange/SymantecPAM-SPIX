@@ -30,7 +30,6 @@ Function _GenerateFolder($path) {
         $foldPath += ($foldername+"\")
         if (!(Test-Path $foldPath)){
             New-Item -ItemType Directory -Path $foldPath | Out-Null
-            # Write-Host "$foldPath Folder Created Successfully"
         }
     }
 }

@@ -55,7 +55,6 @@ function Update-SymTargetAccount ()
             foreach ($p in $params.PSObject.Properties | Where-Object {$_.Name -like 'Attribute*'}) {
                 $cliParams+= @{ $p.Name= $p.Value }
             }
-            #Write-Host "ID= $($params.ID) - Name=$($params.userName)"
             $res= _Invoke-SymantecCLI -cmd "updateTargetAccount" -params $cliParams
 
             return $res

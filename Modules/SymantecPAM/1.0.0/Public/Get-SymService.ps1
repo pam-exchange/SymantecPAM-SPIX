@@ -61,8 +61,6 @@ function Get-SymService ()
                     foreach ($t in [SERVICETYPE].GetEnumNames()) {
                         if ($t -eq 'ALL') {continue}
 
-                        #if ($t -eq 'RDPApplication') {Write-Host "break"}
-
                         $body= @{
                             type= $t
                             fields= '*'
