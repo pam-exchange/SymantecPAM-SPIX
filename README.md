@@ -68,7 +68,7 @@ Will show a brief description of parameters.
 
 ## Export
 
-SPIX **-Export** [-ConfigPath \<path>] [-OutputPath \<path>] [-Category \<category>] [-SrvName \<filter>] [-AppName \<filter>] [-AccName \<filter>] [-ExtensionType \<name>] [-ShowPassword] [-Passphrase \<passphrase>] [-Compress] [-Delimiter \<character>] [-Quiet]
+SPIX **-Export** [&#8209;ConfigPath \<path>] [&#8209;OutputPath \<path>] [&#8209;Category \<category>] [&#8209;SrvName \<filter>] [&#8209;AppName \<filter>] [&#8209;AccName \<filter>] [&#8209;ExtensionType \<name>] [&#8209;ShowPassword] [&#8209;Passphrase \<passphrase>] [&#8209;Compress] [&#8209;Delimiter \<character>] [&#8209;Quiet]
 
 
 | Option | Description |
@@ -139,7 +139,7 @@ Run time: 1 seconds
 Done
 ```
 
-This command will passwords and the user is prompted to enter a passphrase (-passphrase uses a "" as argument). The passphrase is hashed and the hash is used as encryption key. The encryption itself uses a random salt value and two identical passwords will use different encrypted passwords. Exporting twice will also result in different encrypted passwords. Encrypted passwords are prefixed with '{enc}'. The script `SPIX-Password` can generate encrypted passwords, which can be used when importing a CSV file.
+This command will export passwords on TargetAccounts. The user is prompted to enter a passphrase (option **-passphrase** uses a "" as argument). The passphrase is hashed and the hash is used to derive the encryption key. The encryption itself uses a random salt value and two identical passwords will result in different encrypted passwords. Encrypted passwords are prefixed with '{enc}'. The script `SPIX-Password` can generate encrypted passwords, which can be used when importing a CSV file securely.
 
 ```
 PS W:\> .\SPIX.ps1 -Export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Passphrase ""
@@ -159,7 +159,7 @@ Run time: 2 seconds
 Done
 ```
 
-This command will export accounts using -ShowPassword without having a passphrase on the command line. If a passphrase is provided on the command line, the user is not prompted to enter a passphrase. **Note** that Powershell ISE (version 5.1) will prompte the user for a passphrase in a seperate pop-up window.
+This command will export accounts using -ShowPassword without having a passphrase on the command line. If a passphrase is provided on the command line, the user is not prompted to enter a passphrase.<br/>**Note** that Powershell ISE (version 5.1) will prompte the user for a passphrase in a seperate pop-up window.
 
 ```
 PS W:\> .\SPIX.ps1 -export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Passphrase ''
@@ -174,7 +174,7 @@ Done
 
 ## Import
 
-SPIX **-Import** [-ConfigPath \<path>] [-InputFile \<filename>] [-Passphrase \<passphrase>] [-UpdatePassword] [-Delimiter \<character>] [-Quiet]
+SPIX **-Import** [&#8209;ConfigPath \<path>] [&#8209;InputFile \<filename>] [&#8209;Passphrase \<passphrase>] [&#8209;UpdatePassword] [&#8209;Delimiter \<character>] [&#8209;Quiet]
 
 | Option | Description |
 | :---- | :---- |
@@ -193,10 +193,10 @@ The option `-UpdatePassword` is used when creating a new TargetAccount when a kn
 
 ### Import CSV
 
-The exported CSV file will always contain a column **ID**, **ObjectType** and **Action**.
-The CSV file can be used as a template for importing through a CSV file. 
+The exported CSV file will always contain the columns **ID**, **ObjectType** and **Action**.
+The CSV file can be used as a template when importing a CSV file. 
 
-Available actions are
+Available values for actions are
 
 - **New**  
 Will create a new object of the ObjectType. The remaining columns describes the new object and all the parameters necessary.
@@ -207,7 +207,7 @@ Will update the object with the ID and Name. Parameters are found in the remaini
 - **Remove**  
 Will remove or delete the object with the ID and Name.
 
-- **Empty**  
+- Empty  
 The row in the import CSV file is ignored.
  
 
@@ -218,34 +218,46 @@ The row in the import CSV file is ignored.
 
 Import is available for ObjectTypes **Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer** and **UserGroup**.
 
-Other objectTypes may be exported CSV files, but they cannot be imported through **SPIX**.
+Note that it is not possible to create (New) a proxy using a CLI command. A proxy is registered when it is installed and started first time.  
+
+There are more objectTypes that may be exported to CSV files. Either there is no mechanism available for import or an import mechanism is already available in Symantec PAM.
 
 
 ### Errors during import
 
-Should processing a rows result in an error, the row is written to a new file and a column `ErrorMessage` with details is added on a new CSV file. Rows in a CSV file processed without errors will not appear in the new CSV file generated. A message with the filename of the generated CSV file is shown on the console.
+If there is an error importing a CSV file, the row giving an error is written to a new CSV file. The error shown is added as an extra column `ErrorMessage` with details about the error for the specific row. Rows processed without errors will not appear in the new CSV file. A message with the filename of the generated CSV file is shown on the console.
 
 
 # SPIX Password
 
-The utility `SPIX-Passwpord` is available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. Encrypted password is prefixed with `{enc}`.
+The utility `SPIX-Passwpord` is available for encrypting and decrypting a password using a passphrase. Both the encrypted and decrypted password are shown on the console. Encrypted password is or must be prefixed with `{enc}`.
 
-If the **-Passphrase** option is not provided, the user is prompted for the passphrase.
+If the option **-Passphrase** is not used of has an empty value (''), the user is prompted for the passphrase.
 
 
-Encrypt:
+## Encrypt a password
+
+Create an encrypted password using this command
 
 ```
 .\SPIX-Password.ps1 -Passphrase <passphrase> -Password <password> 
 ```
 
-Decrypt:
+Note that even when using the same password and same passphrase will give different encrypted passwords.
+
+
+## Decrypt an encrypted password
+
+Decrypte an encrypted password using this command.
 
 ```
 .\SPIX-Password.ps1 -Passphrase <passphrase> -EncryptedPassword <encrypted password> 
 ```
 
-Example
+The encrypted password must start with '{enc}'.
+
+
+## Example
 
 ```
 PS W:\> .\SPIX-Password.ps1 -Passphrase 'MyPassphrase' -Password 'HelloWorld'
@@ -255,15 +267,10 @@ PS W:\> .\SPIX-Password.ps1 -Passphrase 'MyPassphrase' -Password 'HelloWorld'
 {enc}IG0Zf2BODJkHKgrwIJsbjFf369d4XWbw1oFFHd8KTPNhF9MISBLt70yLeGDyrVXP
 
 PS W:\> .\SPIX-Password.ps1 -Passphrase 'MyPassphrase' -Password 'HelloWorld'
-{enc}GhmDUPlD0v4Fvs27yUt2pEoMxdIhc4oeqDd5eHY8/sjZSfPx+xVm5M+HhX8zQMmp
-
-PS W:\> .\SPIX-Password.ps1 -Passphrase 'MyPassphrase' -Password 'HelloWorld'
 {enc}ElYk9EjTIjbC7/yApiRLm+tqX9TDKH9oP/Gg9Il3cnG5dGMlGd+sg4Eych1aJaZ2
 
 PS W:\> .\SPIX-Password.ps1 -Passphrase 'MyPassphrase' -EncryptedPassword '{enc}ElYk9EjTIjbC7/yApiRLm+tqX9TDKH9oP/Gg9Il3cnG5dGMlGd+sg4Eych1aJaZ2'
 HelloWorld
 
 ```
-
-Note that even when using the same password and same passphrase will give different encrypted passwords.
 
