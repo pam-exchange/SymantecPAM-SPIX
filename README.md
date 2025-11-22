@@ -1,62 +1,63 @@
 # SymantecPAM SPIX
 
-Many years ago a tool named **xsie** was available for exporting information from and importing information to Xceedium Xsuite PAM. The name xsie was short for **Xs**uite **I**mport **E**xport. Not everything could be exported/imported, but specifically the Credential Management part of Xsuite and its successor CA PAM. **xsie** was tested with Xsuite/CA PAM until versioin 3.2. There have been many updates and enhancements with what now is Symantec PAM. The tools here is **S**ymantec **P**AM **I**mport **E**xport or short **SPIX** has a similar functionality as **xsie**, but is also covering enhancements added to Symantec PAM. 
+Many years ago, a tool named **xsie** was available for exporting information from and importing information to Xceedium Xsuite PAM. The name **xsie** stood for **Xs**uite **I**mport **E**xport. Not everything could be exported/imported, but specifically, the Credential Management part of Xsuite and its successor, CA PAM. **xsie** was tested with Xsuite/CA PAM up until version 3.2. Xsuite/CA PAM was later rebranded to Symantec PAM, and many updates and enhancements have been added since version 3.2. The tool described here is **S**ymantec **P**AM **I**mport **E**xport, or simply **SPIX**. It provides similar functionality to **xsie**, but it also covers enhancements added to Symantec PAM.
 
-Symantec PAM has built-in export/import functionality using CSV files for some information in PAM. However, this does not cover the  Credential Management information, and **SPIX** can be used export/import this using CSV files. **SPIX** is written in Powershell whereas **xsie** was written in Perl.
+Symantec PAM has built-in export/import functionality using CSV files for some types of information in PAM. However, this does not cover Credential Management information, which **SPIX** can be used to export/import via CSV files. **SPIX** is written in PowerShell, whereas **xsie** was written in Perl.
 
-**SPIX** uses CLI and API calls for exporting and importing information in Symantec PAM. **SPIX** will use a CLI/API users with the permissions they have in Symantec PAM, thus the permissions granted to the CLI/API users will determine how much information can be exported and if creating/updating/deleting is possible using **SPIX**. The tool does not allow actions in PAM which the CLI/API user does not have permissions to perform. 
+**SPIX** uses both CLI and API calls for exporting and importing information in Symantec PAM. It relies on CLI/API users and the permissions they have in Symantec PAM. The permissions granted to the CLI/API users will determine how much information can be exported, as well as whether creating, updating, or deleting is possible with **SPIX**. The tool does not allow actions in PAM that the CLI/API user does not have permission to perform.
 
-There are three Powershell scripts available. 
+There are three PowerShell scripts available:
 
 - **SPIX-Config**  
-Script for generating a properties file with login credentials to CLI and API.
+  Script for generating a properties file with login credentials for CLI and API.
+  
 - **SPIX**  
-The import/export script including the module SymantecPAM.
+  The import/export script, including the SymantecPAM module.
+  
 - **SPIX-Password**  
-When exporting passwords, these can be as plain text or encrypted using a passphrase. This tool is using the same encryption mechanism to decrypt and encrypt passwords. 
+  When exporting passwords, these can be stored as plain text or encrypted using a passphrase. This tool uses the same encryption mechanism to both encrypt and decrypt passwords.
 
+## Environment
 
-# Environment
-
-SPIX has been tested using the following environment
+**SPIX** has been tested in the following environment:
 
 - Symantec PAM version 4.3
-- Powershell 5.1 and 7.5
+- PowerShell 5.1 and 7.5
 - Windows 11 and Windows Server 2022
 
-It has not been tested running Powershell on Linux. It is unknown if the mechanism for protecting CLI/API user passwords (see below) is working in a Linux environment.
+It has not been tested with PowerShell on Linux. It is unknown whether the mechanism for protecting CLI/API user passwords (see below) works in a Linux environment.
 
-# Setup credentials properties
+## Setting Up Credentials Properties
 
-**SPIX** uses the CLI and occationally the API when reading or updating credential management information. Both of these uses basic authentication (username/password) and these are stored in a properties file. **SPIX-Config** is used to create a properties file with basic configuration of the Symantec PAM encironment and the necessary CLI and API users and passwords. 
+**SPIX** uses the CLI and, occasionally, the API when reading or updating credential management information. Both use basic authentication (username/password), and these credentials are stored in a properties file. **SPIX-Config** is used to create this file, which contains basic configuration for the Symantec PAM environment and the necessary CLI and API users and passwords.
 
-Edit the file **SPIX-Config.ps1** such that it is matching you environment. The **tcf** variable is used to name any Custom Connectors available. Note that the names of Custom Connectors are case sensitive. Both the CLI and API users must exist in PAM. The CLI user is a regular user and the API user is an ApiKey. It is best assigned to the user and should have the same permissions as granted to the CLI user.
- 
-The delimiter is used to change how CSV files are created and read. Depending on the region and language settings of Windows a delimiter value can be specified. If the delimiter option is not specified the default value is `,`. 
+Edit the **SPIX-Config.ps1** file to match your environment. The **tcf** variable is used to name any Custom Connectors that may be available. Note that the names of Custom Connectors are case-sensitive. Both the CLI and API users must exist in PAM. The CLI user is a regular user, and the API user is an ApiKey. The ApiKey is best assigned to the user and should have the same permissions as the CLI user.
 
-The limit is controlling how many entries can be returned when calling CLI/API. There is no paging mechanism available when reading information from PAM, thus if there is more information available, this is not visible to **SPIX**.
+The delimiter specifies how CSV files are created and read. Depending on the region and language settings of Windows, a delimiter value may need to be specified. If no delimiter is specified, the default value is `,`.
 
-```
+The **limit** controls how many entries can be returned when calling the CLI/API. There is no paging mechanism available when reading information from PAM. If there is more information available, it will not be visible to **SPIX**.
+
+```powershell
 $configSymantecPAM = @{
-	type="SymantecPAM"; 
-	DNS= "192.168.xxx.yyy";
+  type = "SymantecPAM"
+  DNS = "192.168.xxx.yyy"
+  
+  cliUsername = "symantecCLI"
+  cliPassword = "xxxxxxxxxxx"
+  
+  apiUsername = "symantecAPI-131001"
+  apiPassword = "xxxxxxxxxxx"
+  
+  tcf = ("keystorefile", "configfile", "mongodb", "postgresql", "pamuser")
+  limit = 100000
+  delimiter = ";"
+}```
 
-	cliUsername= "symantecCLI"; 
-	cliPassword= "xxxxxxxxxxx";
+**SPIX-Config** will generate a properties file in `C:\Temp`. The filename will include the hostname and username. This information is used when PowerShell encrypts the passwords in the properties file.<br/>
+**Note:** The encryption key used to protect the passwords in the properties file is tied to a specific computer and the user running **SPIX-Config**. As a result, the properties file will only work on the same system and for the same user who generated it. In other words, the properties file cannot be transferred to a different server or used by a different user.
 
-	apiUsername= "symantecAPI-131001";
-	apiPassword= "xxxxxxxxxxx";
+**SPIX** will look for the properties file in the current directory by default. The location of the properties file can be changed using a command-line parameter.
 
-	tcf= ("keystorefile","configfile","mongodb","postgresql","pamuser");
-	limit= 100000;
-	delimiter= ";"
-}
-```
-
-**SPIX-Config** will generate a properties file in `C:\Temp`. The filename is will include the hostname and username. These information is used when Powershell encrypts the passwords in the properties file.<br/>
-**Note** that the encryption key used for protecting the passwords in the properties file is bound to a specific computer and the specific user running **SPIX-Config**. The properties file will only work on the same system and for the same user who generated the properties file. I.e. the properties file cannot be transfered to a different server or be used by a different user.
-
-**SPIX** will look for the properties file in the current directory. The location of a properties file can be changed with a command line parameter.
 
 # Running SPIX
 
@@ -89,12 +90,47 @@ SPIX **-Export** [&#8209;ConfigPath \<path>] [&#8209;OutputPath \<path>] [&#8209
 | &#8209;Compress | Used when exporting TargetApplication and TargetAccounts. Instead of creating CSV files for each extensionType, this option will create a single file without attributes specific for extensionTypes for TargetApplications and TargetAccounts. Such a file does not will not include passwords for TargetAccounts. |  
 | &#8209;Quiet | Less output when running SPIX |  
 
-When retrieving account passwords (option `-ShowPassword`) the current PVP used on an account may have options for check-out, notifications and the like. Such settings should not apply when retrieving passwords for export and a new PVP is created and assigned to the account when the password is retrieved. The extra PVP is named `SPIX-PVP` and will be kept in PAM after **SPIX** has completed exporting of target account passwords. It can be deleted manually and will, if needed, be created next time **SPIX** is used for exporting target accounts and associated password.
+When retrieving account passwords (using the `-ShowPassword` option), the current PVP (Password View Policy) applied to an account may have settings for check-out, notifications, and similar actions. These settings should not apply when exporting passwords. Therefore, a new PVP is created and assigned to the account when the password is retrieved. This temporary PVP is named `SPIX-PVP` and will remain in PAM after **SPIX** has completed the export of target account passwords. It can be manually deleted and, if needed, will be recreated the next time **SPIX** is used for exporting target accounts and their associated passwords.
 
-Available values for **extensionType** are the built-in connectors:  
-activeDirectorySshKey, AS400, AwsAccessCredentials, AwsApiProxyCredentials, AzureAccessCredentials, CiscoSSH, Generic, genericSecretType, HPServiceManager, juniper, ldap, mssql, mssqlAzureMI, nsxcontroller, nsxmanager, nsxproxy, oracle, PaloAlto, RadiusTacacsSecret, remedy, ServiceDeskBroker, ServiceNow, SPML2, sybase, unixII, vcf, vmware, weblogic10, windows, windowsDomainService, windowsRemoteAgent, windowsSshKey, windowsSshPassword, XsuiteApiKey
+The available values for **extensionType** include the built-in connectors:
 
-**plus** names for all Custom Connectors specified in the properties `tcf` option. Keep in mind that the names are case sensitive.
+- activeDirectorySshKey
+- AS400
+- AwsAccessCredentials
+- AwsApiProxyCredentials
+- AzureAccessCredentials
+- CiscoSSH
+- Generic
+- genericSecretType
+- HPServiceManager
+- juniper
+- ldap
+- mssql
+- mssqlAzureMI
+- nsxcontroller
+- nsxmanager
+- nsxproxy
+- oracle
+- PaloAlto
+- RadiusTacacsSecret
+- remedy
+- ServiceDeskBroker
+- ServiceNow
+- SPML2
+- sybase
+- unixII
+- vcf
+- vmware
+- weblogic10
+- windows
+- windowsDomainService
+- windowsRemoteAgent
+- windowsSshKey
+- windowsSshPassword
+- XsuiteApiKey
+
+**Additionally**, custom connector names specified in the `tcf` option of the properties file are also valid values. Keep in mind that these names are case-sensitive.
+
 
 
 ### Examples
@@ -162,7 +198,7 @@ Run time: 2 seconds
 Done
 ```
 
-This command will export accounts using -ShowPassword without having a passphrase on the command line. If a passphrase is provided on the command line, the user is not prompted to enter a passphrase.<br/>**Note** that Powershell ISE (version 5.1) will prompte the user for a passphrase in a seperate pop-up window.
+This command will export accounts using **-ShowPassword** without having a passphrase on the command line. If a passphrase is provided on the command line, the user is not prompted to enter a passphrase.<br/>**Note** that Powershell ISE (version 5.1) will prompte the user for a passphrase in a seperate pop-up window.
 
 ```
 PS W:\> .\SPIX.ps1 -export -Category TargetAccount -ExtensionType windowsDomainService -ShowPassword -Passphrase ''
@@ -190,46 +226,45 @@ SPIX **-Import** [&#8209;ConfigPath \<path>] [&#8209;InputFile \<filename>] [&#8
 
 ### Generate new random password
 
-When importing a file with ObjectType TargetAccount, it is possible to let PAM generate a new random password. This is relevant when using the actions **New** and **Update**. Set the value in `password` column to `_generate_pass_`. This will tell PAM to generate a new password according to the PCP defined for the target application.
+When importing a file with an ObjectType of `TargetAccount`, it is possible to let PAM generate a new random password. This is useful when performing the **New** and **Update** actions. To trigger this, set the value in the `password` column to `_generate_pass_`. This instructs PAM to generate a new password according to the Password Change Policy (PCP) defined for the target application.
 
-The option `-UpdatePassword` is used when creating a new TargetAccount when a known password is used at the end-point. After the account added a password update to a new random value using (**_generate_pass_**) is done. Typical use-case is when adding an account in PAM where the password on the end-point is known and the account changes its own password, i.e. there is no otherAccount specified. If there is an otherAccount specified, it is recommended using the account password `_generate_pass_`.
+The `-UpdatePassword` option is used when creating a new `TargetAccount` and a known password is provided for the endpoint. After the account is created, the password is updated to a new random value using `_generate_pass_`. A typical use case for this is when adding an account to PAM where the password on the endpoint is known, and the account is responsible for changing its own password (i.e., there is no other account specified). If another account is specified, it is recommended to use `_generate_pass_` as the password for the new account.
 
 ### Import CSV
 
-The exported CSV file will always contain the columns **ID**, **ObjectType** and **Action**.
-The CSV file can be used as a template when importing a CSV file. 
+The exported CSV file will always include the following columns: **ID**, **ObjectType**, and **Action**. This CSV file can serve as a template when importing data.
 
-Available values for actions are
+The available values for the **Action** column are as follows:
 
 - **New**  
-Will create a new object of the ObjectType. The remaining columns describes the new object and all the parameters necessary.
+  Creates a new object of the specified **ObjectType**. The remaining columns describe the new object and include all the necessary parameters.
 
 - **Update**  
-Will update the object with the ID and Name. Parameters are found in the remaining columns and will depend on the type of object.
+  Updates the existing object identified by its **ID** and **Name**. The parameters to be updated are specified in the remaining columns and depend on the object type.
 
 - **Remove**  
-Will remove or delete the object with the ID and Name.
+  Removes or deletes the object identified by its **ID** and **Name**.
 
-- Empty  
-The row in the import CSV file is ignored.
- 
+- **Empty**  
+  If the action column in a row is empty, it will be ignored during the import process.
+
+
+
 
 ![Export/Import CSV](/Docs/SPIX-Export.png)
 
 
 ### Limitations
 
-Import is available for ObjectTypes **Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer** and **UserGroup**.
+Import functionality is available for the following ObjectTypes: **Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer**, and **UserGroup**.
 
-Note that it is not possible to create (New) a proxy using a CLI command. A proxy is registered when it is installed and started first time.  
+Please note that it is not possible to create (New) a proxy using a CLI command. A proxy is automatically registered when it is installed and started for the first time.
 
-There are more objectTypes that may be exported to CSV files. Either there is no mechanism available for import or an import mechanism is already available in Symantec PAM.
+There are additional ObjectTypes that can be exported to CSV files. However, either an import mechanism is not available for these ObjectTypes, or an import functionality is already built into Symantec PAM.
 
+### Errors During Import
 
-### Errors during import
-
-If there is an error importing a CSV file, the row giving an error is written to a new CSV file. The error shown is added as an extra column `ErrorMessage` with details about the error for the specific row. Rows processed without errors will not appear in the new CSV file. A message with the filename of the generated CSV file is shown on the console.
-
+If an error occurs during the import of a CSV file, the problematic row is written to a new CSV file. The error details are included in an additional column named `ErrorMessage`, which provides specifics about the error for that particular row. Rows that are processed successfully will not appear in the new CSV file. A message indicating the filename of the generated error CSV file will be displayed in the console.
 
 # SPIX Password
 
