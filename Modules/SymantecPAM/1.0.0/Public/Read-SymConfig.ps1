@@ -71,11 +71,10 @@ function Read-SymConfig {
                                                                     cliPageSize= $_.cliPageSize;
                                                                     cliUsername= $_.cliUsername; 
                                                                     cliPassword=$cliPassword;
-                                                                    cliAlias=$cliAlias;
                                                                     apiUsername= $_.apiUsername;
                                                                     apiPassword=$apiPassword;
-                                                                    apiAlias=$apiAlias;
 																	tcf= $_.tcf;
+																	limit= $_.limit;
                                                                     Delimiter= $_.Delimiter;
                                                                 } )
             }

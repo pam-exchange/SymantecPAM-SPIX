@@ -36,7 +36,7 @@ function _Invoke-SymantecCLI () {
     $url= "$($script:cliUrl)`?cmdName=$cmd"
     $url+= "&adminUserID=$($script:cliUsername)"
     $url+= "&adminPassword=$($script:clipassword)"
-    #$url+= "&Page.Size=$($Script:cliPageSize)"
+    $url+= "&Page.Size=$($Script:cliPageSize)"
     
     if ($Params) {
         if ($Params.GetType().name -eq "Hashtable") {

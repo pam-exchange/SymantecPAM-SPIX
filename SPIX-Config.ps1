@@ -11,6 +11,8 @@ $configSymantecPAM = @{
         apiPassword= "xxxxxxxxxxx";
 
         tcf= ("keystorefile","configfile","mongodb","postgresql","pamuser");
+
+        limit= 100000;
         delimiter= ";"
     }
 

@@ -51,14 +51,12 @@ function Start-SymantecPAM (
     $DNS= $config[ "SymantecPAM" ].DNS;
 
     $script:cliURL     = "https://$($DNS)/cspm/servlet/adminCLI"
-    $script:cliPageSize= 100000
+    $script:cliPageSize= $config[ "SymantecPAM" ].limit
     $script:cliUsername= $config[ "SymantecPAM" ].cliUsername
     $script:cliPassword= $config[ "SymantecPAM" ].cliPassword
-    $script:cliAlias   = $config[ "SymantecPAM" ].cliAlias;
     $script:apiURL     = "https://$($DNS)"
     $script:apiUsername= $config[ "SymantecPAM" ].apiUsername
     $script:apiPassword= $config[ "SymantecPAM" ].apiPassword
-    $script:apiAlias   = $config[ "SymantecPAM" ].apiAlias
 	$Script:tcf        = $config[ "SymantecPAM" ].tcf
     $script:Delimiter  = $config[ "SymantecPAM" ].Delimiter
 
