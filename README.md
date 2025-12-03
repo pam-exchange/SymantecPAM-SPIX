@@ -10,18 +10,13 @@ Symantec PAM includes native CSV-based export/import features for certain object
 
 Three PowerShell scripts are provided:
 
-- **SPIX-Config**  
-Generates a properties file containing login credentials for the CLI and API.
-
-- **SPIX**  
-The main export/import script, including the SymantecPAM module.
-
-- **SPIX-Password**  
-Encrypts and decrypts passwords using the same mechanism used during export.
+- **SPIX-Config** — Generates a properties file containing login credentials for the CLI and API.
+- **SPIX** — The main export/import script, including the SymantecPAM module.
+- **SPIX-Password** — Encrypts and decrypts passwords using the same mechanism used during export.
 
 ## Environment
 
-**SPIX** has been tested in the following environment:
+**SPIX** has been tested using:
 
 - Symantec PAM 4.3
 - PowerShell 5.1 and 7.5
@@ -37,9 +32,9 @@ Edit SPIX-Config.ps1 to fit your environment. The tcf variable lists Custom Conn
 
 The `delimiter` setting defines the CSV delimiter. Depending on Windows locale settings, this may need to be changed. If not set, it defaults to a comma (`,`).
 
-The `limit` settomg defines the maximum number of items returned by CLI/API queries. Since PAM does not support paging, items beyond this limit are not retrieved.
+The `limit` setting defines the maximum number of items returned by CLI/API queries. **SPIX** does not support paging and this sets the maximum number of entries exported.
 
-The `tcf` settomg defines names (case-sensitive) for all Custom Connectors used in Symantec PAM.
+The `tcf` setting defines names (case-sensitive) for all Custom Connectors used in Symantec PAM.
 
 
 ```
@@ -79,7 +74,7 @@ Will show a brief description of parameters.
 
 ## Export
 
-SPIX **-Export** [&#8209;ConfigPath \<path>] [&#8209;OutputPath \<path>] [&#8209;Category \<category>] [&#8209;SrvName \<filter>] [&#8209;AppName \<filter>] [&#8209;AccName \<filter>] [&#8209;ExtensionType \<name>] [&#8209;ShowPassword] [&#8209;Passphrase \<passphrase>] [&#8209;Compress] [&#8209;Delimiter \<character>] [&#8209;Quiet]
+SPIX **-Export** [Options]
 
 
 | Option | Description |
@@ -92,8 +87,8 @@ SPIX **-Export** [&#8209;ConfigPath \<path>] [&#8209;OutputPath \<path>] [&#8209
 | &#8209;AccName&nbsp;\<filter> | Filter by account name for categories `Target` and `TargetAccount`.<br/>Supports `*`.  |  
 | &#8209;ExtensionType&nbsp;\<ext> | Filter by extension type for categories `Target`, `TargetApplication` and `TargetAccount`.<br/>Supports `*`. |  
 | &#8209;ShowPassword | Used with categories `Target` and `TargetAccount`. Retrieve password for target accounts and export it in clear text in the CSV file. If the Password View Policy (PVP) used for the target account uses options for checkout, appovals or e-mail notifications, the PVP is temporarely changed to **SPIX-PVP** before the password is retrieved from PAM. If this PVP does not exist it is created. |  
-| &#8209;Passphrase&nbsp;\<passphrase> | Used with `-ShowPassword`. Encrypts exported passwords with key derived from passphrase. If the `passphrase` is empty ('') the user is prompted to enter a passphrase. |  
-| &#8209;Delimiter&nbsp;\<character> | Delimiter character used when writing CSV files. This option will overrule the settings in the properties file. |  
+| &#8209;Passphrase&nbsp;\<passphrase> | Used with `-ShowPassword`. Encrypts exported passwords with key derived from passphrase. If the `passphrase` is empty (`''` or `""`) the user is prompted to enter a passphrase. |  
+| &#8209;Delimiter&nbsp;\<character> | Overrides delimiter from properties file. |  
 | &#8209;Compress | Creates a single file for TargetApplication and TargetAccounts (no extension-specific attributes or passwords). |  
 | &#8209;Quiet | reduce console output. |  
 
@@ -223,7 +218,7 @@ Done
 
 ## Import
 
-SPIX **-Import** [&#8209;ConfigPath \<path>] [&#8209;InputFile \<filename>] [&#8209;Passphrase \<passphrase>] [&#8209;UpdatePassword] [&#8209;Delimiter \<character>] [&#8209;Quiet]
+SPIX **-Import** [Options]
 
 | Option | Description |
 | :---- | :---- |
@@ -248,19 +243,17 @@ All exported CSV file contain **ID**, **ObjectType**, and **Action**. These file
 Valid **Action** values:
 
 - **New** — Creates a new object of the specified **ObjectType**. The remaining columns describe the new object and include all the necessary parameters.
-- **Update** - Updates an existing object identified by **ID** and **Name**.
-- **Remove** - Deletes the object.
-- **Empty** - Row is ignored.
-
+- **Update** — Updates an existing object identified by **ID** and **Name**.
+- **Remove** — Deletes the object.
+- **Empty** — Row is ignored.
 
 ![Export/Import CSV](/Docs/SPIX-Export.png)
-
 
 ### Limitations
 
 Import is supported for:
 
-**Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer**, and **UserGroup**.
+**Authorization**, **PCP**, **Proxy**, **PVP**, **RequestScript**, **RequestServer**, **Role**, **SSHKeyPairPolicy**, **TargetAccount**, **TargetApplication**, **TargetServer**, and **UserGroup**.
 
 Proxies cannot be created cia CLI/API - They register automatically when started first time.
 
@@ -268,7 +261,7 @@ Other ojectTypes can be exported but not imported. PAM already provides import m
 
 ### Errors During Import
 
-If a row fails during import, **SPIX** writes that row to a separate error CSV file and appends an **ErrorMessage** column describing the failure. Successfully processed rows are not included. The script displays the name of the error file.
+If a row fails during import, **SPIX** writes that row to a separate error CSV file and appends an **ErrorMessage** column describing the failure. Successfully processed rows are not included. The name of the error file is shown on the console.
 
 # SPIX Password
 
@@ -283,7 +276,7 @@ Create an encrypted password using this command
 .\SPIX-Password.ps1 -Passphrase <passphrase> -Password <password> 
 ```
 
-Note that even when using the same password and same passphrase will give different encrypted passwords.
+**Note** that even when using the same password and same passphrase will give different encrypted passwords.
 
 
 ## Decrypt an encrypted password

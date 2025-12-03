@@ -127,7 +127,102 @@ process {
             $res= Import-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Passphrase $Passphrase
         }
         else {
-            Write-Host 'some help' -ForegroundColor Green
+Write-Host @"
+SPIX - Symantec PAM Import/Export Tool
+======================================
+
+SPIX is a PowerShell-based utility for exporting and importing
+Credential Management data from Symantec PAM. It extends functionality
+originally provided by the legacy xsie tool and supports new PAM
+features, API/CLI updates, and modern extension types.
+
+SPIX uses both CLI and API calls. All operations are limited to the
+permissions assigned to the authenticated CLI/API users.
+
+Usage:
+  SPIX.ps1 [-Help]
+  SPIX.ps1 -Export   [options]
+  SPIX.ps1 -Import   [options]
+
+Commands:
+  -Help                     Show this help text
+  -Export                   Export objects from Symantec PAM
+  -Import                   Import objects from CSV
+
+General Options:
+  -ConfigPath <path>        Path to SPIX properties file.
+                            Default: .\
+  -Delimiter <char>         CSV delimiter override.
+  -Quiet                    Reduce console output.
+
+----------------------------------------------------------------------
+Export Options
+----------------------------------------------------------------------
+
+SPIX.ps1 -Export [options]
+
+  -OutputPath <path>        Directory where exported CSV files are saved.
+                            Default: .\SPIX-output
+
+  -Category <name>          One or more categories to export:
+                            ALL
+                            Target               (TargetServer, TargetApplication, TargetAccount)
+                            A2A                 (RequestServer, RequestScript, Authorization)
+                            Proxy
+                            Policy              (PCP, PVP, SSHKeyPairPolicy, JIT, CustomWorkflow)
+                            UserGroup           (Filter, Group, Role, User, UserGroup)
+                            Secret              (Vault, VaultSecret)
+                            AccessPolicy
+                            Service
+                            Device
+
+  -SrvName <filter>         Filter by server name. Supports '*'.
+  -AppName <filter>         Filter by application name. Supports '*'.
+  -AccName <filter>         Filter by account name. Supports '*'.
+  -ExtensionType <filter>   Filter by extension type. Supports '*'.
+
+  -ShowPassword             Retrieve and export passwords in clear text.
+                            Requires temporary assignment of SPIX-PVP
+                            if PVP requires checkout/approval/notifications.
+
+  -Passphrase <passphrase>  With -ShowPassword, encrypt passwords using
+                            a passphrase-derived key. Empty ('') prompts.
+
+  -Compress                 Combine application and account data into a
+                            single simplified file (no extension details).
+
+Extension Types:
+  Built-in extension types include: activeDirectorySshKey, AS400, AwsAccessCredentials,
+  AwsApiProxyCredentials, AzureAccessCredentials, CiscoSSH, Generic, genericSecretType,
+  HPServiceManager, juniper, ldap, mssql, oracle, PaloAlto, nsxcontroller, nsxmanager,
+  nsxproxy, remedy, SPML2, unixII, vmware, windows, windowsDomainService, windowsSshKey,
+  windowsSshPassword, weblogic10, sybase, vcf, ServiceDeskBroker, ServiceNow, RadiusTacacsSecret,
+  and more.
+
+  Custom connector names from the 'tcf' property are also supported (case sensitive).
+
+----------------------------------------------------------------------
+Import Options
+----------------------------------------------------------------------
+
+SPIX.ps1 -Import [options]
+
+  -InputFile <file>         CSV file to import.
+  -Passphrase <passphrase>  Decrypt encrypted passwords beginning with {enc}.
+                            Empty ('') prompts for input.
+  -UpdatePassword           For TargetAccounts, after creation replaces known
+                            endpoint password with PAM-generated password.
+
+Import Notes:
+  * "password" = _generate_pass_ → PAM generates a password using the PCP.
+  * Valid Action values in CSV: New, Update, Remove, Empty.
+  * Import supported for:
+      Authorization, PCP, Proxy, PVP, RequestScript, RequestServer,
+      Role, SSHKeyPairPolicy, TargetAccount, TargetApplication,
+      TargetServer, UserGroup.
+  * Proxies cannot be created by CLI/API; they register when launched.
+  * Failed rows are written to a separate error CSV with ErrorMessage column.
+"@
         }
 
     } 
