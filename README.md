@@ -307,3 +307,9 @@ HelloWorld
 
 ```
 
+# Support
+
+There is no obligation to support what you see in this repository. It is fee to use and modify the scripts and documentation. 
+
+Best reffort support is available at **support+spix (@) pam-exchange.ch**.
+
