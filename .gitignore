@@ -1,5 +1,6 @@
 # Ignore 
 /SPIX-output
 /Testdata
+/.vscode
 SPIX-Config-Complete.ps1
 SPIX-*.properties
