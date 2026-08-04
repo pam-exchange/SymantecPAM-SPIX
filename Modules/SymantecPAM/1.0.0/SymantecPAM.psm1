@@ -48,7 +48,32 @@ Try {
 
 #region Load Public Functions
 Try {
+    # 1. Load Interfaces first
+    if (Test-Path "$ScriptPath\Public\Interfaces") {
+        $interfaces = @(Get-ChildItem -Path "$ScriptPath\Public\Interfaces" -Filter *.ps1 -ErrorAction SilentlyContinue)
+        foreach ($import in $interfaces) {
+            try {
+                . $import.FullName
+            } catch {
+                Write-Warning "Failed to import interface $($import.FullName): $_"
+            }
+        }
+    }
+
+    # 2. Load Implementations second
+    if (Test-Path "$ScriptPath\Public\Implementations") {
+        $implementations = @(Get-ChildItem -Path "$ScriptPath\Public\Implementations" -Filter *.ps1 -ErrorAction SilentlyContinue)
+        foreach ($import in $implementations) {
+            try {
+                . $import.FullName
+            } catch {
+                Write-Warning "Failed to import implementation $($import.FullName): $_"
+            }
+        }
+    }
+
     $NoExport= @()
+    # 3. Load standard Public folder files
     $PublicFunctions = @(Get-ChildItem -Path "$ScriptPath\public" -Filter *.ps1 -ErrorAction SilentlyContinue)
     $ToExport = $PublicFunctions | Where-Object { $_.BaseName -notin $NoExport } | Select-Object -ExpandProperty BaseName
 
