@@ -169,3 +169,399 @@ class SymantecPAM {
         return Import-Sym @params
     }
 }
+
+#--------------------------------------------------------------------------------------
+# Resource Model Classes
+#--------------------------------------------------------------------------------------
+
+class AccessPolicy {
+    [int]$ID
+    [string]$ObjectType = "AccessPolicy"
+    [string]$Action
+    [string]$User
+    [string]$Device
+
+    AccessPolicy() {}
+    AccessPolicy([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.User = [string]$obj.User
+        $this.Device = [string]$obj.Device
+    }
+}
+
+class Authorization {
+    [int]$ID
+    [string]$ObjectType = "Authorization"
+    [string]$Action
+    [string]$Target
+    [string]$Request
+    [string]$Script
+    [string]$checkExecutionID
+    [string]$executionUser
+
+    Authorization() {}
+    Authorization([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Target = [string]$obj.Target
+        $this.Request = [string]$obj.Request
+        $this.Script = [string]$obj.Script
+        $this.checkExecutionID = [string]$obj.checkExecutionID
+        $this.executionUser = [string]$obj.executionUser
+    }
+}
+
+class CustomWorkflow {
+    [int]$ID
+    [string]$ObjectType = "CustomWorkflow"
+    [string]$Action
+    [string]$Name
+    [string]$applicationType
+    [string]$Description
+
+    CustomWorkflow() {}
+    CustomWorkflow([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.applicationType = [string]$obj.applicationType
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class Device {
+    [int]$ID
+    [string]$ObjectType = "Device"
+    [string]$Action
+    [string]$Name
+
+    Device() {}
+    Device([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+    }
+}
+
+class Filter {
+    [int]$ID
+    [string]$ObjectType = "Filter"
+    [string]$Action
+
+    Filter() {}
+    Filter([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+    }
+}
+
+class Group {
+    [int]$ID
+    [string]$ObjectType = "Group"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+
+    Group() {}
+    Group([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class PCP {
+    [int]$ID
+    [string]$ObjectType = "PCP"
+    [string]$Action
+    [string]$Name
+    [string]$Type
+    [string]$Description
+
+    PCP() {}
+    PCP([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Type = [string]$obj.Type
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class PVP {
+    [int]$ID
+    [string]$ObjectType = "PVP"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+
+    PVP() {}
+    PVP([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class Proxy {
+    [int]$ID
+    [string]$ObjectType = "Proxy"
+    [string]$Action
+    [string]$deviceName
+    [string]$hostname
+    [string]$ipAddress
+
+    Proxy() {}
+    Proxy([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.deviceName = [string]$obj.deviceName
+        $this.hostname = [string]$obj.hostname
+        $this.ipAddress = [string]$obj.ipAddress
+    }
+}
+
+class RequestScript {
+    [int]$ID
+    [string]$ObjectType = "RequestScript"
+    [string]$Action
+    [string]$Name
+    [string]$RequestServer
+    [string]$Type
+
+    RequestScript() {}
+    RequestScript([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.RequestServer = [string]$obj.RequestServer
+        $this.Type = [string]$obj.Type
+    }
+}
+
+class RequestServer {
+    [int]$ID
+    [string]$ObjectType = "RequestServer"
+    [string]$Action
+    [string]$deviceName
+    [string]$hostname
+    [string]$ipAddress
+    [string]$Attribute_descriptor1
+    [string]$Attribute_descriptor2
+
+    RequestServer() {}
+    RequestServer([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.deviceName = [string]$obj.deviceName
+        $this.hostname = [string]$obj.hostname
+        $this.ipAddress = [string]$obj.ipAddress
+        if ($obj.PSObject.Properties['Attribute.descriptor1']) { $this.Attribute_descriptor1 = [string]$obj.'Attribute.descriptor1' }
+        if ($obj.PSObject.Properties['Attribute.descriptor2']) { $this.Attribute_descriptor2 = [string]$obj.'Attribute.descriptor2' }
+    }
+}
+
+class Role {
+    [int]$ID
+    [string]$ObjectType = "Role"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+
+    Role() {}
+    Role([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class Service {
+    [int]$ID
+    [string]$ObjectType = "Service"
+    [string]$Action
+    [string]$Name
+    [string]$ServiceType
+    [string]$localIP
+    [string]$ports
+    [string]$comments
+
+    Service() {}
+    Service([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.ServiceType = [string]$obj.ServiceType
+        $this.localIP = [string]$obj.localIP
+        $this.ports = [string]$obj.ports
+        $this.comments = [string]$obj.comments
+    }
+}
+
+class SSHKeyPairPolicy {
+    [int]$ID
+    [string]$ObjectType = "SSHKeyPairPolicy"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+    [string]$Attribute_keyType
+    [string]$Attribute_keyLength
+
+    SSHKeyPairPolicy() {}
+    SSHKeyPairPolicy([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+        if ($obj.PSObject.Properties['Attribute.keyType']) { $this.Attribute_keyType = [string]$obj.'Attribute.keyType' }
+        if ($obj.PSObject.Properties['Attribute.keyLength']) { $this.Attribute_keyLength = [string]$obj.'Attribute.keyLength' }
+    }
+}
+
+class TargetAccount {
+    [int]$ID
+    [string]$ObjectType = "TargetAccount"
+    [string]$Action
+    [string]$ExtensionType
+    [string]$deviceName
+    [string]$hostname
+    [string]$targetApplicationName
+    [string]$userName
+    [string]$password
+
+    TargetAccount() {}
+    TargetAccount([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.ExtensionType = [string]$obj.ExtensionType
+        $this.deviceName = [string]$obj.deviceName
+        $this.hostname = [string]$obj.hostname
+        $this.targetApplicationName = [string]$obj.targetApplicationName
+        $this.userName = [string]$obj.userName
+        $this.password = [string]$obj.password
+    }
+}
+
+class TargetAlias {
+    [int]$ID
+    [string]$ObjectType = "TargetAlias"
+    [string]$Action
+    [string]$Name
+    [string]$userName
+    [int]$targetApplicationID
+
+    TargetAlias() {}
+    TargetAlias([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.userName = [string]$obj.userName
+        if ($obj.PSObject.Properties['TargetApplicationID']) { $this.targetApplicationID = [int]$obj.TargetApplicationID }
+    }
+}
+
+class TargetApplication {
+    [int]$ID
+    [string]$ObjectType = "TargetApplication"
+    [string]$Action
+    [string]$ExtensionType
+    [string]$deviceName
+    [string]$hostname
+    [string]$Name
+    [string]$PCP
+    [string]$Attribute_descriptor1
+    [string]$Attribute_descriptor2
+
+    TargetApplication() {}
+    TargetApplication([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.ExtensionType = [string]$obj.ExtensionType
+        $this.deviceName = [string]$obj.deviceName
+        $this.hostname = [string]$obj.hostname
+        $this.Name = [string]$obj.Name
+        $this.PCP = [string]$obj.PCP
+        if ($obj.PSObject.Properties['Attribute.descriptor1']) { $this.Attribute_descriptor1 = [string]$obj.'Attribute.descriptor1' }
+        if ($obj.PSObject.Properties['Attribute.descriptor2']) { $this.Attribute_descriptor2 = [string]$obj.'Attribute.descriptor2' }
+    }
+}
+
+class TargetServer {
+    [int]$ID
+    [string]$ObjectType = "TargetServer"
+    [string]$Action
+    [string]$deviceName
+    [string]$hostname
+    [string]$ipAddress
+    [string]$Attribute_descriptor1
+    [string]$Attribute_descriptor2
+
+    TargetServer() {}
+    TargetServer([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.deviceName = [string]$obj.deviceName
+        $this.hostname = [string]$obj.hostname
+        $this.ipAddress = [string]$obj.ipAddress
+        if ($obj.PSObject.Properties['Attribute.descriptor1']) { $this.Attribute_descriptor1 = [string]$obj.'Attribute.descriptor1' }
+        if ($obj.PSObject.Properties['Attribute.descriptor2']) { $this.Attribute_descriptor2 = [string]$obj.'Attribute.descriptor2' }
+    }
+}
+
+class User {
+    [int]$ID
+    [string]$ObjectType = "User"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+
+    User() {}
+    User([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+    }
+}
+
+class UserGroup {
+    [int]$ID
+    [string]$ObjectType = "UserGroup"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+    [string]$targetGroup
+    [string]$requestorGroup
+    [string]$Role
+
+    UserGroup() {}
+    UserGroup([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+        $this.targetGroup = [string]$obj.targetGroup
+        $this.requestorGroup = [string]$obj.requestorGroup
+        $this.Role = [string]$obj.Role
+    }
+}
+
+class Vault {
+    [int]$ID
+    [string]$ObjectType = "Vault"
+    [string]$Action
+    [string]$Name
+    [string]$Description
+
+    Vault() {}
+    Vault([object]$obj) {
+        $this.ID = [int]$obj.ID
+        $this.Action = [string]$obj.Action
+        $this.Name = [string]$obj.Name
+        $this.Description = [string]$obj.Description
+    }
+}
