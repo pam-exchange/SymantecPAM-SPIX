@@ -86,11 +86,11 @@ process {
         }
 
         if ($password) {
-            $EncryptedPassword= Protect-SymPassword -Password $Password -Passphrase $Passphrase
+            $EncryptedPassword = [SymantecPAMCrypto]::Protect($Password, $Passphrase)
             Write-Host $EncryptedPassword
         }
         else {
-            $Password= Unprotect-SymPassword -EncryptedPassword $EncryptedPassword -Passphrase $Passphrase
+            $Password = [SymantecPAMCrypto]::Unprotect($EncryptedPassword, $Passphrase)
             Write-Host $password
         }
 

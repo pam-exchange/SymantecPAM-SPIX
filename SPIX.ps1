@@ -93,7 +93,7 @@ begin {
 process {
 
     try {
-        Start-SymantecPAM -ConfigPath $ConfigPath
+        $pam = [SymantecPAM]::new($ConfigPath)
 
         $Timestamp= $startTime.ToString('yyyyMMdd-HHmmss')
 
@@ -121,10 +121,36 @@ process {
         }
 
         if ($Export) {
-            Export-Sym -Timestamp $Timestamp -OutputPath $OutputPath -Category $Category -SrvName $SrvName -AppName $AppName -AccName $AccName -ExtensionType $ExtensionType -Compress:$Compress -showPassword:$ShowPassword -Passphrase $Passphrase -Quiet:$Quiet
+            $exportParams = @{
+                Timestamp     = $Timestamp
+                OutputPath    = $OutputPath
+                Category      = $Category
+                SrvName       = $SrvName
+                AppName       = $AppName
+                AccName       = $AccName
+                ExtensionType = $ExtensionType
+                Compress      = $Compress
+                ShowPassword  = $ShowPassword
+                Passphrase    = $Passphrase
+                Quiet         = $Quiet
+            }
+            if ($PSBoundParameters.ContainsKey('Delimiter')) {
+                $exportParams['Delimiter'] = $Delimiter
+            }
+            $pam.Export($exportParams)
         }
         elseif ($Import) {
-            $res= Import-Sym -InputFile $InputFile -Delimiter $Delimiter -Timestamp $Timestamp -Synchronize:$Synchronize -UpdatePassword:$UpdatePassword -Passphrase $Passphrase
+            $importParams = @{
+                InputFile      = $InputFile
+                Timestamp      = $Timestamp
+                Synchronize    = $Synchronize
+                UpdatePassword = $UpdatePassword
+                Passphrase     = $Passphrase
+            }
+            if ($PSBoundParameters.ContainsKey('Delimiter')) {
+                $importParams['Delimiter'] = $Delimiter
+            }
+            $res = $pam.Import($importParams)
         }
         else {
 Write-Host @"
@@ -231,7 +257,9 @@ Import Notes:
         Write-Host $_.ScriptStackTrace -ForegroundColor Gray
     }
     finally {
-        Stop-SymantecPAM
+        if ($null -ne $pam) {
+            $pam.Stop()
+        }
     }
 
 }
