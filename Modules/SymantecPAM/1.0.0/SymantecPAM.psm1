@@ -28,8 +28,36 @@ $ScriptPath = Split-Path $MyInvocation.MyCommand.Path
 $PSModule = $ExecutionContext.SessionState.Module
 $PSModuleRoot = $PSModule.ModuleBase
 
-#region Load Private Functions
+#region Load Interfaces First
 Try {
+    if (Test-Path "$ScriptPath\Public\Interfaces") {
+        $interfaces = @(Get-ChildItem -Path "$ScriptPath\Public\Interfaces" -Filter *.ps1 -ErrorAction SilentlyContinue)
+        foreach ($import in $interfaces) {
+            try {
+                . $import.FullName
+            } catch {
+                Write-Warning "Failed to import interface $($import.FullName): $_"
+            }
+        }
+    }
+} Catch {
+    Write-Warning "Failed to import interfaces: $_"
+}
+#endregion Load Interfaces First
+
+#region Load Private Implementations & Functions
+Try {
+    if (Test-Path "$ScriptPath\Private\Implementations") {
+        $implementations = @(Get-ChildItem -Path "$ScriptPath\Private\Implementations" -Filter *.ps1 -ErrorAction SilentlyContinue)
+        foreach ($import in $implementations) {
+            try {
+                . $import.FullName
+            } catch {
+                Write-Warning "Failed to import private implementation $($import.FullName): $_"
+            }
+        }
+    }
+
     if (Test-Path "$ScriptPath\Private") {
         $PrivateFunctions = @(Get-ChildItem -Path "$ScriptPath\Private" -Filter *.ps1 -ErrorAction SilentlyContinue)
         foreach ($import in $PrivateFunctions) {
@@ -42,13 +70,13 @@ Try {
     }
 } Catch {
     Write-Warning "Failed to import private function: $_"
-    Continue
 }
-#endregion Load Private Functions
+#endregion Load Private Implementations & Functions
 
 #region Load Public Functions
 Try {
     $NoExport= @()
+    # Load standard Public folder files
     $PublicFunctions = @(Get-ChildItem -Path "$ScriptPath\public" -Filter *.ps1 -ErrorAction SilentlyContinue)
     $ToExport = $PublicFunctions | Where-Object { $_.BaseName -notin $NoExport } | Select-Object -ExpandProperty BaseName
 
